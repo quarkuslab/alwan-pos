@@ -4,14 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run build:web && npm run copy:web",
+    "dev": "concurrently -n \"WEB,ANDROID\" -c \"blue,green\" \"npm run dev:web\" \"npm run dev:android\"",
+    "build": "npm run build:web && npm run copy:web && npm run build:android",
     "dev:web": "vite",
+    "dev:android": "cd android && gradlew installDebug && adb shell am start -n com.quarkus.alwanpos.debug/com.quarkus.alwanpos.MainActivity",
     "build:web": "tsc -b && vite build",
+    "build:android": "cd android && gradlew assembleRelease && echo 'APK location: android/app/build/outputs/apk/release/app-release.apk'",
     "lint": "eslint .",
     "preview": "vite preview",
     "copy:web": "cpx build/**/* android/app/src/main/assets/build"
   },
   "dependencies": {
+    "concurrently": "^9.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
