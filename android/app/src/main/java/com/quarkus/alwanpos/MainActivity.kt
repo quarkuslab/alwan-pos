@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
             addJavascriptInterface(WebAppInterface(context), "Android")
             addJavascriptInterface(PrinterBridge(), "PrinterBridge")
             Log.d("WebView", "Loading URL: ${BuildConfig.WEBVIEW_URL}")
-            loadUrl("file:///android_asset/build/index.html")
+            loadUrl(BuildConfig.WEBVIEW_URL)
         }
         setContentView(webView)
     }
