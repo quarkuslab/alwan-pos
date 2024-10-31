@@ -1,4 +1,4 @@
-export interface ReceiptItem {
+interface ReceiptItem {
   name: string;
   qty: number;
   uom: string;

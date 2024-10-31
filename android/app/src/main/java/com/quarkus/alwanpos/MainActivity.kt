@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
             addJavascriptInterface(PrinterBridge(), "PrinterBridge")
             Log.d("WebView", "Loading URL: ${BuildConfig.WEBVIEW_URL}")
             loadUrl(BuildConfig.WEBVIEW_URL)
+
         }
         setContentView(webView)
     }

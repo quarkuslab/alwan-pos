@@ -1,6 +1,6 @@
-import PrinterService from './services/printer.service';
+import PrinterService from "./services/printer.service";
 
-function App() {
+export default function App() {
   async function print() {
     await PrinterService.print({
       companyName: 'Alwan Alqarya Exhibition Organizing 1',
@@ -35,9 +35,9 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col items-center justify-center">
-      <button className='bg-black px-12 py-4 text-white rounded-md' onClick={print}>Print Test</button>
+      <button className="bg-black text-white px-12 py-4 rounded-md" onClick={print}>
+        Print Test
+      </button>
     </div>
-  )
+  );
 }
-
-export default App
