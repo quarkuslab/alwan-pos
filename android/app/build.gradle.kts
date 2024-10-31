@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+val buildEnvironment: String? by project
+
 android {
     namespace = "com.quarkus.alwanpos"
     compileSdk = 34
@@ -26,7 +28,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "WEBVIEW_URL", "\"http://10.0.2.2:5173\"")
+            // Define the WebView URL based on the buildEnvironment parameter
+            val webviewUrl = when (buildEnvironment) {
+                "static" -> "file:///android_asset/build/index.html"
+                else -> "http://10.0.2.2:5173"
+            }
+            buildConfigField("String", "WEBVIEW_URL", "\"$webviewUrl\"")
             applicationIdSuffix = ".debug"
         }
         release {

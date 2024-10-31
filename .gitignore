@@ -1,4 +1,6 @@
 android/app/src/main/assets/build/
+android/app/release/
+android/**/*.keystore.*
 
 # Logs
 logs
