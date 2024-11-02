@@ -30,7 +30,7 @@ android {
         debug {
             // Define the WebView URL based on the buildEnvironment parameter
             val webviewUrl = if (buildEnvironment == "static") {
-                "file:///android_asset/build/index.html"
+                "file:///android_asset/www/index.html"
             } else {
                 "http://10.0.2.2:5173"  // Default value when buildEnvironment is not "static"
             }
@@ -38,7 +38,7 @@ android {
             applicationIdSuffix = ".debug"
         }
         release {
-            buildConfigField("String", "WEBVIEW_URL", "\"file:///android_asset/build/index.html\"")
+            buildConfigField("String", "WEBVIEW_URL", "\"file:///android_asset/www/index.html\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
