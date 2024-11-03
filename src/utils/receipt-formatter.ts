@@ -55,20 +55,16 @@ export class ReceiptFormatter {
 
   private getHeader(): string[] {
     return [
-      this.center('Service Order'),
-      this.divider,
       this.center(this.data.companyName),
       this.center('L.L.C'),
       `TRN: ${this.data.trn}`,
       this.data.companyAddress,
       this.data.contactInfo,
       this.divider,
-      'OrderNo:',
-      this.data.orderNo,
+      `Order No: ${this.data.orderNo}`,
       `Order Date:${this.data.orderDate}`,
-      'Customer Details:',
-      this.data.customerName,
-      this.data.customerNumber,
+      `Customer Name: ${this.data.customerName}`,
+      `Customer Mobile: ${this.data.customerNumber}`,
       this.divider,
       'Item         Qty UOM  Price      Value',
       this.divider

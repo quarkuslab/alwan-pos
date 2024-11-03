@@ -44,11 +44,8 @@ class MainActivity : ComponentActivity() {
                 domStorageEnabled = true
                 allowFileAccess = true
                 allowContentAccess = true
-                allowFileAccessFromFileURLs = true
-                allowUniversalAccessFromFileURLs = true
             }
             webViewClient = object : WebViewClient() {}
-            addJavascriptInterface(WebAppInterface(context), "Android")
             addJavascriptInterface(PrinterBridge(), "PrinterBridge")
             loadUrl("file:///android_asset/www/index.html")
         }
@@ -71,10 +68,45 @@ class MainActivity : ComponentActivity() {
 
     inner class PrinterBridge {
         @JavascriptInterface
-        fun print(text: String) {
+        fun printText(text: String) {
             try {
                 printerService?.apply {
+                    // Left Align text
+                    setAlignment(0, null)
                     printText(text, null)
+                    lineWrap(1, null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        
+        @JavascriptInterface
+        fun printBarcode(data: String) {
+            try {
+                printerService?.apply {
+                    // Center align the barcode
+                    setAlignment(1, null)
+                    printBarCode(
+                        data,           // barcode content
+                        8,              // CODE128 type
+                        162,            // height
+                        2,              // width
+                        0,              // no text
+                        null            // callback
+                    )
+
+                    lineWrap(1, null)     // Cut paper after barcode
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun cutPaper() {
+            try {
+                printerService?.apply {
                     lineWrap(3, null)
                     cutPaper(null)
                 }
@@ -87,14 +119,5 @@ class MainActivity : ComponentActivity() {
         fun getPrinterStatus(): Int {
             return printerService?.updatePrinterState() ?: -1
         }
-    }
-
-}
-
-
-class WebAppInterface(private val context: Context) {
-    @JavascriptInterface
-    fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

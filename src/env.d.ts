@@ -1,8 +1,10 @@
 declare global {
   interface Window {
     PrinterBridge?: {
-      print: (text: string) => Promise<void>
-      getPrinterStatus: () => Promise<number>
+      printText: (text: string) => Promise<void>
+      printBarcode: (data: string) => Promise<void>;
+      cutPaper: () => Promise<void>
+      getPrinterStatus: () => Promise<number>;
     }
   }
 }
