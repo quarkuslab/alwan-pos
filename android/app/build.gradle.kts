@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-val buildEnvironment = project.findProperty("buildEnvironment")?.toString() ?: "default"
-
 android {
     namespace = "com.quarkus.alwanpos"
     compileSdk = 34
@@ -29,16 +27,9 @@ android {
     buildTypes {
         debug {
             // Define the WebView URL based on the buildEnvironment parameter
-            val webviewUrl = if (buildEnvironment == "static") {
-                "file:///android_asset/www/index.html"
-            } else {
-                "http://10.0.2.2:5173"  // Default value when buildEnvironment is not "static"
-            }
-            buildConfigField("String", "WEBVIEW_URL", "\"$webviewUrl\"")
             applicationIdSuffix = ".debug"
         }
         release {
-            buildConfigField("String", "WEBVIEW_URL", "\"file:///android_asset/www/index.html\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
