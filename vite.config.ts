@@ -30,6 +30,9 @@ const legacyTargets = {
 };
 
 export default defineConfig({
+  define: {
+    __API_URL__: JSON.stringify(process.env.API_URL)
+  },
   plugins: [
     react(),
     legacy({

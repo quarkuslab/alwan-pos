@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n \"WEB,ANDROID\" -c \"blue,green\" \"npm run web:dev\" \"npm run android:dev\"",
-    "web:dev": "vite",
+    "web:dev": "dotenv -- vite",
     "android:dev": "nodemon --watch android --watch src --ignore android/app/src/main/assets/www --ignore android/app/build --ignore android/.gradle --ignore android/.idea --ext ts,tsx,css,html,java,kt,xml,gradle --exec \"npm run web:build && npm run android:copy && npm run android:build && npm run android:launch\"",
     "build": "npm run web:build && npm run android:copy && npm run android:build",
     "web:build": "tsc -b && vite build",
@@ -16,9 +16,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "axios": "^1.7.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "cpx2": "^8.0.0",
+    "lucide-react": "^0.454.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.1",
+    "react-router": "^6.27.0",
+    "react-router-dom": "^6.27.0",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -29,6 +40,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.1",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
