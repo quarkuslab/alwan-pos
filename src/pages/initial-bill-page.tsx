@@ -1,3 +1,4 @@
+import InitialBillForm from "@/components/forms/InitialBillForm";
 import { useCounterState } from "@/hooks/useCounter";
 import { useMemo } from "react";
 import { useParams } from "react-router";
@@ -17,9 +18,8 @@ export default function InitialBillPage() {
   }
 
   return (
-    <div>
-      <div>Initial Bill</div>
-      <div>{service.title}</div>
+    <div className="min-h-[calc(100vh-5rem)] flex flex-col items-center justify-center">
+      <InitialBillForm service={service} />
     </div>
   );
 }

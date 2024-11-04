@@ -1,16 +1,16 @@
-import * as React from 'react';
-import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
-import { type VariantProps } from 'class-variance-authority';
+import * as React from "react";
+import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
+import { type VariantProps } from "class-variance-authority";
 
-import { cn } from '@/lib/utils';
-import { toggleVariants } from '@/components/ui/toggle';
-import { useFormField } from './form';
+import { cn } from "@/lib/utils";
+import { toggleVariants } from "@/components/ui/toggle";
+import { useFormField } from "./form";
 
 const FormSelectionGroupContext = React.createContext<
   VariantProps<typeof toggleVariants>
 >({
-  size: 'default',
-  variant: 'default',
+  size: "default",
+  variant: "default",
 });
 
 const FormSelectionGroup = React.forwardRef<
@@ -23,10 +23,9 @@ const FormSelectionGroup = React.forwardRef<
     <ToggleGroupPrimitive.Root
       ref={ref}
       className={cn(
-        'flex items-center justify-center',
-        'grid grid-cols-2 border border-primary-950 rounded-lg overflow-hidden bg-white divide-x divide-primary-950',
-        error && 'border-red-500',
-        className,
+        "flex h-10 items-center justify-center border border-primary-950 rounded-lg overflow-hidden bg-white divide-x divide-primary-950",
+        error && "border-red-500",
+        className
       )}
       {...props}
     >
@@ -37,7 +36,7 @@ const FormSelectionGroup = React.forwardRef<
   );
 });
 
-FormSelectionGroup.displayName = 'FormSelectionGroup';
+FormSelectionGroup.displayName = "FormSelectionGroup";
 
 const FormSelectionGroupItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
@@ -54,8 +53,8 @@ const FormSelectionGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        'data-[state=on]:bg-primary-950 data-[state=on]:text-white px-10 py-7 text-lg font-medium rounded-r-none [&:last-child]:rounded-l-none',
-        className,
+        "data-[state=on]:bg-primary-950 data-[state=on]:text-white px-8 h-full flex items-center justify-center text-base font-medium rounded-r-none [&:last-child]:rounded-l-none",
+        className
       )}
       {...props}
     >
@@ -64,6 +63,6 @@ const FormSelectionGroupItem = React.forwardRef<
   );
 });
 
-FormSelectionGroupItem.displayName = 'FormSelectionGroupItem';
+FormSelectionGroupItem.displayName = "FormSelectionGroupItem";
 
 export { FormSelectionGroup, FormSelectionGroupItem };

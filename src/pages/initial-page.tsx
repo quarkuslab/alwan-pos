@@ -13,9 +13,9 @@ export default function InitialPage() {
     );
   }
   if (counter.status == "not-registered") {
-    return <Navigate to="/register" />;
+    return <Navigate to="/register" replace />;
   }
   if (counter.status == "loaded") {
-    return <Navigate to="/app" />;
+    return <Navigate to="/app" replace />;
   }
 }

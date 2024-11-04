@@ -12,15 +12,52 @@ import androidx.activity.ComponentActivity
 import com.sunmi.peripheral.printer.InnerPrinterCallback
 import com.sunmi.peripheral.printer.InnerPrinterManager
 import com.sunmi.peripheral.printer.SunmiPrinterService
+import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private var printerService: SunmiPrinterService? = null
 
+    // Add these variables for back button handling
+    private var doubleBackToExitPressedOnce = false
+    private val handler = Handler(Looper.getMainLooper())
+    private val doublePressDelay = 2000L // 2 seconds window for second press
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initWebView()
         initPrinter()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        // First check if WebView can go back
+        if (webView.canGoBack()) {
+            webView.goBack()
+            return
+        }
+
+        // If WebView cannot go back, handle double press to exit
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed()
+            return
+        }
+
+        doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show()
+
+        handler.postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, doublePressDelay)
+    }
+
+    // Make sure to remove any callbacks when the activity is destroyed
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
