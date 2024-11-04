@@ -3,6 +3,7 @@ import RootLayout from "./layouts/RootLayout";
 import InitialPage from "./pages/initial-page";
 import RegisterPage from "./pages/register-page";
 import AppLayout from "./layouts/AppLayout";
+import InitialBillPage from "./pages/initial-bill-page";
 
 const Routes: RouteObject[] = [
   {
@@ -20,6 +21,12 @@ const Routes: RouteObject[] = [
       {
         path: "app",
         element: <AppLayout />,
+        children: [
+          {
+            path: "initial-bill/:service",
+            element: <InitialBillPage />,
+          },
+        ],
       },
     ],
   },

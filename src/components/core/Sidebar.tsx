@@ -16,7 +16,7 @@ export default function Sidebar() {
             <SidebarButton
               key={service.id}
               label={service.title}
-              href={`/app/${service.id}`}
+              href={`/app/initial-bill/${service.id}`}
             />
           ))
         ) : (
