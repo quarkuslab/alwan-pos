@@ -2,7 +2,7 @@ import InitialBillConfirmationDialog from "@/components/core/InitialBillConfirma
 import InitialBillForm from "@/components/forms/InitialBillForm";
 import { useCounterState } from "@/hooks/useCounter";
 import { CreateInitialBillData } from "@/services/bill.service";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router";
 
 export default function InitialBillPage() {
@@ -16,6 +16,10 @@ export default function InitialBillPage() {
     }
   }, [counter, params]);
 
+  const createInitialBill = useCallback(async (data: CreateInitialBillData) => {
+    console.log(data);
+  }, []);
+
   if (!service) {
     return null;
   }
@@ -25,6 +29,7 @@ export default function InitialBillPage() {
       <InitialBillConfirmationDialog
         data={data}
         onClose={() => setData(null)}
+        onConfirm={createInitialBill}
       />
       <div className="min-h-[calc(100vh-5rem)] flex flex-col items-center justify-center">
         <InitialBillForm service={service} onSubmit={setData} />
