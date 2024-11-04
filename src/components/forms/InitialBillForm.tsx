@@ -19,11 +19,13 @@ import {
   FormSelectionGroupItem,
 } from "../ui/form-selection-group";
 import { displayAmount } from "@/utils/amount";
-import { CircleDollarSign, CreditCard } from "lucide-react";
+import { CircleDollarSign, Clock, CreditCard } from "lucide-react";
 import { CounterService } from "@/services/counter.service";
+import { CreateInitialBillData } from "@/services/bill.service";
 
 interface Props {
   service: CounterService;
+  onSubmit: (data: CreateInitialBillData) => void;
 }
 
 const formSchema = z.object({
@@ -33,7 +35,7 @@ const formSchema = z.object({
   payment: z.enum(["cash", "card"]),
 });
 
-export default function InitialBillForm({ service }: Props) {
+export default function InitialBillForm({ service, onSubmit }: Props) {
   const time = useTime();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,15 +46,22 @@ export default function InitialBillForm({ service }: Props) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values, service);
+  async function handleSubmit(values: z.infer<typeof formSchema>) {
+    onSubmit({
+      customerName: values.name,
+      customerPhone: values.phone,
+      remarks: values.remarks,
+      paymentMethod: values.payment,
+      time,
+      service,
+    });
   }
 
   return (
     <Form {...form}>
       <form
         className="w-full max-w-2xl space-y-5"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleSubmit)}
       >
         <div className="grid grid-cols-5 space-x-5">
           <div className="col-span-3">
@@ -99,20 +108,7 @@ export default function InitialBillForm({ service }: Props) {
             )}
           />
         </div>
-        <div className="flex items-center justify-between space-x-5">
-          <div>
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <FormControl>
-                <FormInput
-                  className="text-2xl"
-                  disabled
-                  value={displayTime(time)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </div>
+        <div className="flex items-end justify-between space-x-5">
           <div>
             <FormField
               control={form.control}
@@ -139,6 +135,10 @@ export default function InitialBillForm({ service }: Props) {
                 </FormItem>
               )}
             />
+          </div>
+          <div className="flex items-center justify-center space-x-3 bg-white px-5 py-2 border border-primary-950 rounded-md">
+            <Clock />
+            <span className="text-xl">{displayTime(time)}</span>
           </div>
         </div>
         <div className="bg-white border border-primary-950 rounded-md flex items-center justify-between p-10">

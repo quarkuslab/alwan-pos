@@ -10,7 +10,7 @@ export default function Sidebar() {
       <div className="flex items-center justify-center">
         <img className="h-[140px]" src={logo} alt="logo" />
       </div>
-      <div className="flex-1 p-5 flex flex-col items-stretch space-y-5">
+      <div className="flex-1 p-5 flex flex-col items-stretch space-y-5 overflow-y-scroll">
         {counter.status == "loaded" ? (
           counter.services.map((service) => (
             <SidebarButton

@@ -16,7 +16,7 @@ export default function SidebarButton(props: Props) {
       to={props.href}
       replace={shouldReplace}
       className={cn(
-        "w-full h-full max-h-40 grid place-content-center rounded-md bg-primary-200 hover:bg-primary-300 text-xl font-medium",
+        "w-full h-full min-h-14 grid place-content-center rounded-md bg-primary-200 hover:bg-primary-300 text-xl font-medium",
         isActive && "bg-primary-950 hover:bg-primary-950 text-white"
       )}
     >

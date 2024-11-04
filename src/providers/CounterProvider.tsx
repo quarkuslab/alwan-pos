@@ -16,13 +16,13 @@ export default function CounterProvider({ children }: Props) {
   const [state, setState] = useState<CounterState>({ status: "loading" });
 
   const register: CounterContextType["register"] = useCallback(async (data) => {
-    const token = await CounterService.register(data);
+    const { token, counter } = await CounterService.register(data);
     const services = await CounterService.getServices(token);
     await SettingsService.setToken(token);
     setState({
       status: "loaded",
       token: token,
-      counter: data,
+      counter: counter,
       services,
     });
   }, []);

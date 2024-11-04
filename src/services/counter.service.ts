@@ -1,6 +1,7 @@
 import client from "@/lib/client";
 
 export interface CounterData {
+  id: string
   name: string
   contactNumber: string
 }
@@ -25,14 +26,15 @@ const CounterService = {
       },
     });
     return {
+      id: res.data.counter.id,
       name: res.data.counter.name,
       contactNumber: res.data.counter.contactNumber
     }
   },
 
-  async register(data: { name: string; contactNumber: string }): Promise<string> {
+  async register(data: { name: string; contactNumber: string }): Promise<{ counter: CounterData; token: string }> {
     const res = await client.post("/counters/register", data);
-    return res.data.token
+    return res.data
   },
 
   async getServices(token: string): Promise<CounterService[]> {
