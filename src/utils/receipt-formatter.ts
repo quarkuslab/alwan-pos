@@ -9,7 +9,6 @@ interface ReceiptItem {
 export interface ReceiptData {
   companyName: string;
   companyAddress: string;
-  trn: string;
   contactInfo: string;
   orderNo: string;
   orderDate: string;
@@ -57,7 +56,6 @@ export class ReceiptFormatter {
     return [
       this.center(this.data.companyName),
       this.center('L.L.C'),
-      `TRN: ${this.data.trn}`,
       this.data.companyAddress,
       this.data.contactInfo,
       this.divider,

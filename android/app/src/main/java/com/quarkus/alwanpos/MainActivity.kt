@@ -2,19 +2,20 @@ package com.quarkus.alwanpos
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.webkit.WebViewAssetLoader
 import com.sunmi.peripheral.printer.InnerPrinterCallback
 import com.sunmi.peripheral.printer.InnerPrinterManager
 import com.sunmi.peripheral.printer.SunmiPrinterService
-import android.widget.Toast
-import android.os.Handler
-import android.os.Looper
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
@@ -60,44 +61,31 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "NewApi")
     private fun initWebView() {
         val context = this
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         webView = WebView(this).apply {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                allowFileAccess = true
-                allowContentAccess = true
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
             }
             webViewClient = object : WebViewClient() {
                 override fun shouldInterceptRequest(
-                    view: WebView?,
+                    view: WebView,
                     request: WebResourceRequest
                 ): WebResourceResponse? {
-                    val url = request.url.toString()
-                    if (url.endsWith(".js")) {
-                        try {
-                            // Open the file from assets
-                            val path = url.replace("file:///android_asset/", "")
-                            val input = context.assets.open(path)
-
-                            // Return with correct MIME type
-                            return WebResourceResponse(
-                                "application/javascript",
-                                "UTF-8",
-                                input
-                            )
-                        } catch (e: Exception) {
-                            Log.e("WebView", "Error loading JS file: ${e.message}")
-                        }
-                    }
-                    return super.shouldInterceptRequest(view, request)
+                    return assetLoader.shouldInterceptRequest(request.url)
                 }
             }
             addJavascriptInterface(PrinterBridge(), "PrinterBridge")
             addJavascriptInterface(SettingsBridge(context), "SettingsBridge")
-            loadUrl("file:///android_asset/www/index.html")
+            loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
         }
         setContentView(webView)
     }

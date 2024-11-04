@@ -4,7 +4,7 @@ import { MoveLeft, Search, Settings } from "lucide-react";
 import useTime from "@/hooks/useTime";
 import IconButton from "./IconButton";
 import { displayDateWithTime } from "@/utils/time";
-import { useCounterState } from "@/hooks/useCounter";
+import { useSystemState } from "@/hooks/useSystem";
 
 const BACK_BUTTON_CONDITIONS = [
   "advance",
@@ -16,7 +16,7 @@ const BACK_BUTTON_CONDITIONS = [
 ];
 
 export default function Header() {
-  const counter = useCounterState();
+  const system = useSystemState();
   const time = useTime();
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Header() {
       <div className="flex-1">
         <div className={cn("flex flex-col items-start justify-center gap-0")}>
           <div className="text-xl font-medium">
-            {counter.status == "loaded" ? counter.counter.name : ""}
+            {system.status == "loaded" ? system.counter.name : ""}
           </div>
           <div className="opacity-70 text-sm">{displayDateWithTime(time)}</div>
         </div>

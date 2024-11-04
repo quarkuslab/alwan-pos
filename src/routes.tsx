@@ -1,9 +1,9 @@
 import { RouteObject } from "react-router-dom";
 import RootLayout from "./layouts/RootLayout";
-import InitialPage from "./pages/initial-page";
 import RegisterPage from "./pages/register-page";
 import AppLayout from "./layouts/AppLayout";
 import InitialBillPage from "./pages/initial-bill-page";
+import SplashPage from "./pages/splash-page";
 
 const Routes: RouteObject[] = [
   {
@@ -12,7 +12,7 @@ const Routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <InitialPage />,
+        element: <SplashPage />,
       },
       {
         path: "register",

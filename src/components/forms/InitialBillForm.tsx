@@ -20,12 +20,17 @@ import {
 } from "../ui/form-selection-group";
 import { displayAmount } from "@/utils/amount";
 import { CircleDollarSign, Clock, CreditCard } from "lucide-react";
-import { CounterService } from "@/services/counter.service";
 import { CreateInitialBillData } from "@/services/bill.service";
+import { SystemService } from "@/services/system.service";
+import { forwardRef, useCallback, useImperativeHandle } from "react";
 
 interface Props {
-  service: CounterService;
+  service: SystemService;
   onSubmit: (data: CreateInitialBillData) => void;
+}
+
+interface Methods {
+  reset: () => void;
 }
 
 const formSchema = z.object({
@@ -35,7 +40,7 @@ const formSchema = z.object({
   payment: z.enum(["cash", "card"]),
 });
 
-export default function InitialBillForm({ service, onSubmit }: Props) {
+const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
   const time = useTime();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,14 +51,22 @@ export default function InitialBillForm({ service, onSubmit }: Props) {
     },
   });
 
+  const resetForm = useCallback(() => {
+    form.reset();
+  }, [form]);
+
+  useImperativeHandle(ref, () => ({
+    reset: resetForm,
+  }));
+
   async function handleSubmit(values: z.infer<typeof formSchema>) {
-    onSubmit({
+    props.onSubmit({
       customerName: values.name,
       customerPhone: values.phone,
       remarks: values.remarks,
       paymentMethod: values.payment,
       time,
-      service,
+      service: props.service,
     });
   }
 
@@ -144,14 +157,14 @@ export default function InitialBillForm({ service, onSubmit }: Props) {
         <div className="bg-white border border-primary-950 rounded-md flex items-center justify-between p-10">
           <div className="text-2xl font-bold">ADVANCE TO BE PAID:</div>
           <div className="text-4xl font-bold">
-            AED {displayAmount(service.advanceAmount)}
+            AED {displayAmount(props.service.advanceAmount)}
           </div>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="text-lg font-medium">PRICE PER HOUR:</div>
             <div className="text-2xl font-bold ml-20">
-              AED {displayAmount(service.pricePerHour)}
+              AED {displayAmount(props.service.pricePerHour)}
             </div>
           </div>
           <div>
@@ -163,4 +176,6 @@ export default function InitialBillForm({ service, onSubmit }: Props) {
       </form>
     </Form>
   );
-}
+});
+
+export default InitialBillForm;

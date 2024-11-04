@@ -1,14 +1,22 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import Routes from "./routes";
 import TimeProvider from "./providers/TimeProvider";
-import CounterProvider from "./providers/CounterProvider";
+import OperationsProvider from "./providers/OperationsProvider";
+import SystemProvider from "./providers/SystemProvider";
+import { Fragment } from "react/jsx-runtime";
+import { Toaster } from "./components/ui/toaster";
 
 export default function App() {
   return (
-    <TimeProvider>
-      <CounterProvider>
-        <RouterProvider router={createHashRouter(Routes)} />
-      </CounterProvider>
-    </TimeProvider>
+    <Fragment>
+      <Toaster />
+      <TimeProvider>
+        <SystemProvider>
+          <OperationsProvider>
+            <RouterProvider router={createHashRouter(Routes)} />
+          </OperationsProvider>
+        </SystemProvider>
+      </TimeProvider>
+    </Fragment>
   );
 }

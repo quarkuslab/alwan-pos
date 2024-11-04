@@ -21,32 +21,42 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Spinner from "@/components/ui/spinner";
 import { useNavigate } from "react-router";
-import { useCounterRegister } from "@/hooks/useCounter";
+import { useSystemRegister } from "@/hooks/useSystem";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Required" }),
-  contactNumber: z.string().min(1, { message: "Required" }),
+  contactInfo: z.string().min(1, { message: "Required" }),
 });
 
 export default function RegisterPage() {
   const [isLoading, setLoading] = useState(false);
-  const register = useCounterRegister();
+  const { toast } = useToast();
+  const register = useSystemRegister();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      contactNumber: "",
+      contactInfo: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    await register({
-      name: values.name,
-      contactNumber: values.contactNumber,
-    });
-    navigate("/app");
+    try {
+      await register({
+        name: values.name,
+        contactInfo: values.contactInfo,
+      });
+      navigate("/app", { replace: true });
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: String(e),
+      });
+    }
     setLoading(false);
   }
 
@@ -82,10 +92,10 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <FormField
                     control={form.control}
-                    name="contactNumber"
+                    name="contactInfo"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Contact Number</FormLabel>
+                        <FormLabel>Contact Info</FormLabel>
                         <FormControl>
                           <FormInput {...field} />
                         </FormControl>

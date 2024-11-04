@@ -1,12 +1,12 @@
 import client from "@/lib/client";
 
-export interface CounterData {
+export interface SystemCounter {
   id: string
   name: string
-  contactNumber: string
+  contactInfo: string
 }
 
-export interface CounterService {
+export interface SystemService {
   id: string
   title: string
   calculationMethod: 'usage' | 'balance'
@@ -18,26 +18,27 @@ export interface CounterService {
   updatedAt: Date
 }
 
-const CounterService = {
-  async getDetails(token: string): Promise<CounterData> {
+export interface SystemRegisterData {
+  name: string;
+  contactInfo: string
+}
+
+export const SystemService = {
+  async getDetails(token: string): Promise<SystemCounter> {
     const res = await client.get("/counters/current", {
       headers: {
         "X-Counter-Token": token,
       },
     });
-    return {
-      id: res.data.counter.id,
-      name: res.data.counter.name,
-      contactNumber: res.data.counter.contactNumber
-    }
+    return res.data.counter
   },
 
-  async register(data: { name: string; contactNumber: string }): Promise<{ counter: CounterData; token: string }> {
+  async register(data: SystemRegisterData): Promise<{ counter: SystemCounter; token: string }> {
     const res = await client.post("/counters/register", data);
     return res.data
   },
 
-  async getServices(token: string): Promise<CounterService[]> {
+  async getServices(token: string): Promise<SystemService[]> {
     const res = await client.get('/services', {
       headers: {
         'X-Counter-Token': token
@@ -46,5 +47,3 @@ const CounterService = {
     return res.data.services
   }
 }
-
-export default CounterService
