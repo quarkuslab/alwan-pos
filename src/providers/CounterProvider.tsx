@@ -1,4 +1,8 @@
-import { AuthContext, AuthState } from "@/contexts/auth";
+import {
+  CounterContext,
+  CounterContextType,
+  CounterState,
+} from "@/contexts/counter.context";
 import useOnMount from "@/hooks/useOnMount";
 import CounterService from "@/services/counter.service";
 import SettingsService from "@/services/settings.service";
@@ -8,16 +12,18 @@ interface Props {
   children: ReactNode;
 }
 
-export default function AuthProvider({ children }: Props) {
-  const [state, setState] = useState<AuthState>({ status: "loading" });
+export default function CounterProvider({ children }: Props) {
+  const [state, setState] = useState<CounterState>({ status: "loading" });
 
-  const register: AuthContext["register"] = useCallback(async (data) => {
+  const register: CounterContextType["register"] = useCallback(async (data) => {
     const token = await CounterService.register(data);
+    const services = await CounterService.getServices(token);
     await SettingsService.setToken(token);
     setState({
-      status: "authenticated",
+      status: "loaded",
       token: token,
       counter: data,
+      services,
     });
   }, []);
 
@@ -27,22 +33,24 @@ export default function AuthProvider({ children }: Props) {
       setState({ status: "not-registered" });
     } else {
       const counter = await CounterService.getDetails(token);
+      const services = await CounterService.getServices(token);
       setState({
-        status: "authenticated",
+        status: "loaded",
         token,
         counter,
+        services,
       });
     }
   });
 
   return (
-    <AuthContext.Provider
+    <CounterContext.Provider
       value={{
         state,
         register,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </CounterContext.Provider>
   );
 }

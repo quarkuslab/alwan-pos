@@ -1,7 +1,24 @@
 import client from "@/lib/client";
 
+export interface CounterData {
+  name: string
+  contactNumber: string
+}
+
+export interface CounterService {
+  id: string
+  title: string
+  calculationMethod: 'usage' | 'balance'
+  advanceAmount: number
+  pricePerHour: number
+  description: string | null
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 const CounterService = {
-  async getDetails(token: string) {
+  async getDetails(token: string): Promise<CounterData> {
     const res = await client.get("/counters/current", {
       headers: {
         "X-Counter-Token": token,
@@ -13,9 +30,18 @@ const CounterService = {
     }
   },
 
-  async register(data: { name: string; contactNumber: string }) {
+  async register(data: { name: string; contactNumber: string }): Promise<string> {
     const res = await client.post("/counters/register", data);
-    return res.data.token as string
+    return res.data.token
+  },
+
+  async getServices(token: string): Promise<CounterService[]> {
+    const res = await client.get('/services', {
+      headers: {
+        'X-Counter-Token': token
+      }
+    })
+    return res.data.services
   }
 }
 

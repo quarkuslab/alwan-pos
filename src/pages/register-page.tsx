@@ -18,10 +18,10 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useAuthRegister } from "@/hooks/useAuth";
 import { useState } from "react";
 import Spinner from "@/components/ui/spinner";
 import { useNavigate } from "react-router";
+import { useCounterRegister } from "@/hooks/useCounter";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Required" }),
@@ -30,7 +30,7 @@ const formSchema = z.object({
 
 export default function RegisterPage() {
   const [isLoading, setLoading] = useState(false);
-  const register = useAuthRegister();
+  const register = useCounterRegister();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,12 +51,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen overflow-y-scroll bg-white flex-col items-center justify-center">
+    <div className="min-h-screen overflow-y-scroll bg-white flex flex-col items-center justify-center">
       <div className="flex flex-col items-center justify-center">
         <img className="h-[200px]" src={logo} alt="logo" />
       </div>
 
-      <div className="max-w-2xl mx-auto py-10">
+      <div className="w-full max-w-2xl mx-auto py-10">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card>
@@ -71,7 +71,7 @@ export default function RegisterPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>Counter Name</FormLabel>
                         <FormControl>
                           <FormInput {...field} />
                         </FormControl>

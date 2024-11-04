@@ -6,6 +6,7 @@ export default function useOnMount(callback: () => MaybePromise<void>) {
 
   useEffect(() => {
     if (!mounted.current) {
+      mounted.current = true
       callback()
     }
   }, [callback])
