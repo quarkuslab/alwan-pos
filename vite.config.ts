@@ -52,7 +52,7 @@ export default defineConfig({
     }),
     htmlRelativePathsPlugin()
   ],
-  base: '',
+  base: './',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
