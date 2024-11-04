@@ -2,7 +2,7 @@ import client from "@/lib/client";
 
 const CounterService = {
   async getDetails(token: string) {
-    const res = await client.get("/counter/current", {
+    const res = await client.get("/counters/current", {
       headers: {
         "X-Counter-Token": token,
       },
@@ -14,7 +14,7 @@ const CounterService = {
   },
 
   async register(data: { name: string; contactNumber: string }) {
-    const res = await client.post("/counter/register", data);
+    const res = await client.post("/counters/register", data);
     return res.data.token as string
   }
 }
