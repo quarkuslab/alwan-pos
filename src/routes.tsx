@@ -26,6 +26,10 @@ const Routes: RouteObject[] = [
             path: "initial-bill/:service",
             element: <InitialBillPage />,
           },
+          {
+            path: "initial-bill/:service/confirm",
+            element: <InitialBillPage />,
+          },
         ],
       },
     ],
