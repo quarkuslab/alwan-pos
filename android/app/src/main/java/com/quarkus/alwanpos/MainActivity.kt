@@ -1,26 +1,14 @@
 package com.quarkus.alwanpos
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.webkit.JavascriptInterface
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.quarkus.alwanpos.ui.theme.AlwanPOSTheme
 import com.sunmi.peripheral.printer.InnerPrinterCallback
 import com.sunmi.peripheral.printer.InnerPrinterManager
 import com.sunmi.peripheral.printer.SunmiPrinterService
@@ -45,8 +33,33 @@ class MainActivity : ComponentActivity() {
                 allowFileAccess = true
                 allowContentAccess = true
             }
-            webViewClient = object : WebViewClient() {}
+            webViewClient = object : WebViewClient() {
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest
+                ): WebResourceResponse? {
+                    val url = request.url.toString()
+                    if (url.endsWith(".js")) {
+                        try {
+                            // Open the file from assets
+                            val path = url.replace("file:///android_asset/", "")
+                            val input = context.assets.open(path)
+
+                            // Return with correct MIME type
+                            return WebResourceResponse(
+                                "application/javascript",
+                                "UTF-8",
+                                input
+                            )
+                        } catch (e: Exception) {
+                            Log.e("WebView", "Error loading JS file: ${e.message}")
+                        }
+                    }
+                    return super.shouldInterceptRequest(view, request)
+                }
+            }
             addJavascriptInterface(PrinterBridge(), "PrinterBridge")
+            addJavascriptInterface(SettingsBridge(context), "SettingsBridge")
             loadUrl("file:///android_asset/www/index.html")
         }
         setContentView(webView)

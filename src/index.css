@@ -5,4 +5,11 @@
   :root {
     --radius: 0.5rem
   }
+  body {
+    @apply overflow-hidden bg-primary-50 select-none;
+  }
+  a,
+  button {
+    @apply cursor-default;
+  }
 }
