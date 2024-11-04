@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
-import { ChartColumn, MoveLeft, Search, Settings } from "lucide-react";
+import { MoveLeft, Search, Settings } from "lucide-react";
 import useTime from "@/hooks/useTime";
 import IconButton from "./IconButton";
 import { displayDateWithTime } from "@/utils/time";
+import { useCounterState } from "@/hooks/useCounter";
 
 const BACK_BUTTON_CONDITIONS = [
   "advance",
@@ -15,6 +16,7 @@ const BACK_BUTTON_CONDITIONS = [
 ];
 
 export default function Header() {
+  const counter = useCounterState();
   const time = useTime();
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,19 +32,15 @@ export default function Header() {
         </div>
       ) : null}
       <div className="flex-1">
-        <div
-          className={cn(
-            "flex flex-col items-start justify-center gap-0"
-            // showBackButton && 'items-center',
-          )}
-        >
-          <div className="text-xl font-medium">Main Gate, Counter 1</div>
+        <div className={cn("flex flex-col items-start justify-center gap-0")}>
+          <div className="text-xl font-medium">
+            {counter.status == "loaded" ? counter.counter.name : ""}
+          </div>
           <div className="opacity-70 text-sm">{displayDateWithTime(time)}</div>
         </div>
       </div>
       <div className="flex space-x-3">
         <IconButton icon={Search} href="/app/search" />
-        <IconButton icon={ChartColumn} href="/app/dashboard" />
         <IconButton icon={Settings} href="/app/settings" />
       </div>
     </header>
