@@ -31,7 +31,7 @@ export interface CreateInitialBillData {
 
 export const BillService = {
   async createInitialBill(opts: { token: string; counter: SystemCounter; data: CreateInitialBillData }): Promise<InitialBill> {
-    const res = await client.post('/bills/initial', {
+    const res = await client.post('/operations/counter/create-initial-bill', {
       serviceId: opts.data.service.id,
       customerName: opts.data.customerName,
       customerPhone: opts.data.customerPhone,
@@ -80,7 +80,7 @@ export const BillService = {
 
 
   async search(token: string, query: string): Promise<SearchResultBill[]> {
-    const res = await client.post('/counters/search', { query }, {
+    const res = await client.post('/operations/counter/search', { query }, {
       headers: {
         'X-Counter-Token': token
       }
