@@ -66,7 +66,7 @@ export default function RegisterPage() {
         <img className="h-[200px]" src={logo} alt="logo" />
       </div>
 
-      <div className="w-full max-w-2xl mx-auto py-10">
+      <div className="w-full max-w-3xl mx-auto py-10">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card>

@@ -73,7 +73,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
   return (
     <Form {...form}>
       <form
-        className="w-full max-w-2xl space-y-5"
+        className="w-full max-w-3xl space-y-5"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
         <div className="grid grid-cols-5 space-x-5">

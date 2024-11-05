@@ -16,6 +16,10 @@ export interface InitialBill {
   counterId: string;
 }
 
+export interface SearchResultBill extends InitialBill {
+  service: SystemService
+}
+
 export interface CreateInitialBillData {
   customerName: string;
   customerPhone?: string;
@@ -72,5 +76,16 @@ export const BillService = {
       ],
     });
     return res.data.initialBill
+  },
+
+
+  async search(token: string, query: string): Promise<SearchResultBill[]> {
+    const res = await client.post('/counters/search', { query }, {
+      headers: {
+        'X-Counter-Token': token
+      }
+    })
+    // @ts-expect-error ignore conversion errors
+    return res.data.bills.map((bill: object) => ({ ...bill, startTime: new Date(bill.startTime) } as SearchResultBill))
   }
 }
