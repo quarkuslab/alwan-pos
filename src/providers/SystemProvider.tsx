@@ -3,6 +3,7 @@ import {
   SystemContextType,
   SystemState,
 } from "@/contexts/system.context";
+import { useAsyncToast } from "@/hooks/useAsyncToast";
 import useOnMount from "@/hooks/useOnMount";
 import SettingsService from "@/services/settings.service";
 import { SystemService } from "@/services/system.service";
@@ -14,6 +15,7 @@ interface Props {
 
 export default function SystemProvider({ children }: Props) {
   const [state, setState] = useState<SystemState>({ status: "loading" });
+  const toast = useAsyncToast();
 
   const register: SystemContextType["register"] = useCallback(async (data) => {
     const { token, counter } = await SystemService.register(data);
@@ -26,6 +28,28 @@ export default function SystemProvider({ children }: Props) {
       services,
     });
   }, []);
+
+  const updateContactInfo: SystemContextType["updateContactInfo"] = useCallback(
+    async (info) => {
+      if (state.status == "loaded") {
+        const promise = SystemService.updateDetails(state.token, {
+          contactInfo: info,
+        });
+        toast({
+          promise,
+          loading: "Updating contact info...",
+          success: "Updated contact info successfully",
+          error: () => "Failed to update contact info",
+        });
+        const updatedCounter = await promise;
+        setState({
+          ...state,
+          counter: updatedCounter,
+        });
+      }
+    },
+    [state, toast]
+  );
 
   useOnMount(async () => {
     const token = await SettingsService.getToken();
@@ -52,6 +76,7 @@ export default function SystemProvider({ children }: Props) {
       value={{
         state,
         register,
+        updateContactInfo,
       }}
     >
       {children}
