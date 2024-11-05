@@ -4,6 +4,7 @@ import RegisterPage from "./pages/register-page";
 import AppLayout from "./layouts/AppLayout";
 import InitialBillPage from "./pages/initial-bill-page";
 import SplashPage from "./pages/splash-page";
+import FinalBillPage from "./pages/final-bill-page";
 
 const Routes: RouteObject[] = [
   {
@@ -29,6 +30,10 @@ const Routes: RouteObject[] = [
           {
             path: "initial-bill/:service/confirm",
             element: <InitialBillPage />,
+          },
+          {
+            path: "final-bill",
+            element: <FinalBillPage />,
           },
         ],
       },

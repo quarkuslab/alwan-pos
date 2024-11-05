@@ -1,4 +1,5 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
+import { NuqsAdapter } from "nuqs/adapters/react-router";
 import Routes from "./routes";
 import TimeProvider from "./providers/TimeProvider";
 import OperationsProvider from "./providers/OperationsProvider";
@@ -13,7 +14,9 @@ export default function App() {
       <TimeProvider>
         <SystemProvider>
           <OperationsProvider>
-            <RouterProvider router={createHashRouter(Routes)} />
+            <NuqsAdapter>
+              <RouterProvider router={createHashRouter(Routes)} />
+            </NuqsAdapter>
           </OperationsProvider>
         </SystemProvider>
       </TimeProvider>
