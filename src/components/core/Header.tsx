@@ -5,6 +5,7 @@ import useTime from "@/hooks/useTime";
 import IconButton from "./IconButton";
 import { displayDateWithTime } from "@/utils/time";
 import { useSystemState } from "@/hooks/useSystem";
+import FinalBillButton from "./FinalBillButton";
 
 const BACK_BUTTON_CONDITIONS = [
   "advance",
@@ -40,6 +41,7 @@ export default function Header() {
         </div>
       </div>
       <div className="flex space-x-3">
+        <FinalBillButton href="/app/final-bill" />
         <IconButton icon={Search} href="/app/search" />
         <IconButton icon={Settings} href="/app/settings" />
       </div>

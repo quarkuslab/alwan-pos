@@ -11,7 +11,7 @@ interface Props {
 export default function IconButton(props: Props) {
   const match = useMatch(props.href ?? "");
   const defaultStyles =
-    "w-12 h-12 bg-primary-200 hover:bg-primary-300 p-3 rounded-md flex items-center justify-center text-4xl";
+    "w-12 h-12 bg-primary-200 p-3 rounded-md flex items-center justify-center text-4xl";
 
   if (props.href) {
     return (

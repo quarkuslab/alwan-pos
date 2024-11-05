@@ -1,19 +1,20 @@
 import { cn } from "@/lib/utils";
-import { MouseEvent, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { ReceiptText } from "lucide-react";
+import { useRef, MouseEvent } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 interface Props {
-  label: string;
   href: string;
 }
 
-export default function SidebarButton(props: Props) {
+export default function FinalBillButton(props: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = location.pathname.includes(props.href);
   const shouldReplace =
     location.pathname.includes("initial-bill") ||
-    location.pathname.includes("final-bill");
+    location.pathname.includes("search") ||
+    location.pathname.includes("settings");
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   function handleClick(e: MouseEvent) {
@@ -27,13 +28,14 @@ export default function SidebarButton(props: Props) {
   return (
     <button
       className={cn(
-        "w-full h-full min-h-14 grid place-content-center rounded-md bg-primary-200 text-xl font-medium",
-        isActive && "bg-primary-950 hover:bg-primary-950 text-white"
+        "h-12 flex items-center justify-center px-6 rounded-md bg-primary-200",
+        isActive && "bg-primary-950 text-white"
       )}
       ref={buttonRef}
       onClick={handleClick}
     >
-      {props.label}
+      <ReceiptText />
+      <span className="ml-3 font-medium">Final Bill</span>
     </button>
   );
 }
