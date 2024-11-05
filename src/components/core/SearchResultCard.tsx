@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 interface Props {
   searchQuery: string;
   bill: SearchResultBill;
-  onCancel?: (id: number) => void;
+  onCancel?: (bill: SearchResultBill) => void;
 }
 
 export default function SearchResultCard({
@@ -41,10 +41,7 @@ export default function SearchResultCard({
               ) : null}
               <div className="flex items-center space-x-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <HighlightText
-                  text={displayTime(bill.startTime)}
-                  query={searchQuery}
-                />
+                <span>{displayTime(bill.startTime)}</span>
               </div>
             </div>
           </div>
@@ -62,7 +59,7 @@ export default function SearchResultCard({
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => onCancel && onCancel(bill.id)}
+                onClick={() => onCancel && onCancel(bill)}
               >
                 Cancel Bill
               </Button>

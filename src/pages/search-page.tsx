@@ -6,9 +6,11 @@ import SearchResultCard from "@/components/core/SearchResultCard";
 import { useSystemState } from "@/hooks/useSystem";
 import IconButton from "@/components/core/IconButton";
 import { RotateCw } from "lucide-react";
+import { useCancelBillOperation } from "@/hooks/useOperations";
 
 export default function SearchPage() {
   const system = useSystemState();
+  const cancelBill = useCancelBillOperation();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultBill[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +43,14 @@ export default function SearchPage() {
     []
   );
 
+  const handleBillCancel = useCallback(
+    async (bill: SearchResultBill) => {
+      await cancelBill(bill.id);
+      await debouncedSearch(query);
+    },
+    [cancelBill, debouncedSearch, query]
+  );
+
   // Effect to trigger search when query changes
   useEffect(() => {
     debouncedSearch(query);
@@ -65,9 +75,7 @@ export default function SearchPage() {
         </div>
       </div>
       <div className="flex-1 overflow-y-scroll">
-        <div className="w-full max-w-3xl mx-auto space-y-4 p-10">
-          {isLoading && <div className="text-gray-500">Loading...</div>}
-
+        <div className="w-full max-w-3xl mx-auto space-y-4 p-5">
           {!isLoading && results.length === 0 && query && (
             <div className="text-gray-500">No results found</div>
           )}
@@ -77,6 +85,7 @@ export default function SearchPage() {
               searchQuery={query}
               bill={result}
               key={result.id}
+              onCancel={handleBillCancel}
             />
           ))}
         </div>

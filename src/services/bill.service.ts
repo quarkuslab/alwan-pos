@@ -17,7 +17,7 @@ export interface InitialBill {
 }
 
 export interface SearchResultBill extends InitialBill {
-  service: SystemService
+  service: SystemService;
 }
 
 export interface CreateInitialBillData {
@@ -30,23 +30,31 @@ export interface CreateInitialBillData {
 }
 
 export const BillService = {
-  async createInitialBill(opts: { token: string; counter: SystemCounter; data: CreateInitialBillData }): Promise<InitialBill> {
-    const res = await client.post('/operations/counter/create-initial-bill', {
-      serviceId: opts.data.service.id,
-      customerName: opts.data.customerName,
-      customerPhone: opts.data.customerPhone,
-      startTime: opts.data.time,
-      amountPaid: opts.data.service.advanceAmount,
-      paymentMethod: opts.data.paymentMethod
-    }, {
-      headers: {
-        'X-Counter-Token': opts.token
+  async createInitialBill(opts: {
+    token: string;
+    counter: SystemCounter;
+    data: CreateInitialBillData;
+  }): Promise<InitialBill> {
+    const res = await client.post(
+      "/operations/counter/create-initial-bill",
+      {
+        serviceId: opts.data.service.id,
+        customerName: opts.data.customerName,
+        customerPhone: opts.data.customerPhone,
+        startTime: opts.data.time,
+        amountPaid: opts.data.service.advanceAmount,
+        paymentMethod: opts.data.paymentMethod,
+      },
+      {
+        headers: {
+          "X-Counter-Token": opts.token,
+        },
       }
-    })
+    );
     const initialBill: InitialBill = {
       ...res.data.initialBill,
-      startTime: new Date(res.data.initialBill.startTime)
-    }
+      startTime: new Date(res.data.initialBill.startTime),
+    };
     await PrinterService.print({
       companyName: "Alwan Alqarya Exhibition Organizing",
       companyAddress: opts.counter.name,
@@ -75,17 +83,35 @@ export const BillService = {
         },
       ],
     });
-    return res.data.initialBill
+    return res.data.initialBill;
   },
 
-
   async search(token: string, query: string): Promise<SearchResultBill[]> {
-    const res = await client.post('/operations/counter/search', { query }, {
-      headers: {
-        'X-Counter-Token': token
+    const res = await client.post(
+      "/operations/counter/search",
+      { query },
+      {
+        headers: {
+          "X-Counter-Token": token,
+        },
       }
-    })
-    // @ts-expect-error ignore conversion errors
-    return res.data.bills.map((bill: object) => ({ ...bill, startTime: new Date(bill.startTime) } as SearchResultBill))
-  }
-}
+    );
+    return res.data.bills.map(
+      (bill: object) =>
+        // @ts-expect-error ignore conversion errors
+        ({ ...bill, startTime: new Date(bill.startTime) } as SearchResultBill)
+    );
+  },
+
+  async cancelBill(token: string, billId: number): Promise<void> {
+    await client.post(
+      "/operations/counter/cancel-bill",
+      { billId },
+      {
+        headers: {
+          "X-Counter-Token": token,
+        },
+      }
+    );
+  },
+};

@@ -1,6 +1,6 @@
 import InitialBillConfirmationDialog from "@/components/core/InitialBillConfirmationDialog";
 import InitialBillForm from "@/components/forms/InitialBillForm";
-import { useCreateInitialBill } from "@/hooks/useCreateInitialBill";
+import { useCreateInitialBillOperation } from "@/hooks/useOperations";
 import { useSystemState } from "@/hooks/useSystem";
 import { CreateInitialBillData } from "@/services/bill.service";
 import {
@@ -20,7 +20,7 @@ export default function InitialBillPage() {
   const navigate = useNavigate();
   const system = useSystemState();
   const params = useParams();
-  const createInitialBill = useCreateInitialBill();
+  const createInitialBill = useCreateInitialBillOperation();
   const formRef = useRef<ComponentRef<typeof InitialBillForm>>(null);
 
   useEffect(() => {

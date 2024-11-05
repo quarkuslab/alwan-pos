@@ -31,10 +31,27 @@ export default function OperationsProvider({ children }: Props) {
     [system, toast]
   );
 
+  const cancelBill = useCallback(
+    async (id: number) => {
+      if (system.status == "loaded") {
+        const promise = BillService.cancelBill(system.token, id);
+        toast({
+          promise,
+          loading: "Cancelling bill...",
+          success: "Bill canceled successfully",
+          error: () => "Bill Cancellation failed",
+        });
+        await promise;
+      }
+    },
+    [system, toast]
+  );
+
   return (
     <OperationsContext.Provider
       value={{
         createInitialBill,
+        cancelBill,
       }}
     >
       {children}
