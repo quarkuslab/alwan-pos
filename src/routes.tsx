@@ -5,6 +5,8 @@ import AppLayout from "./layouts/AppLayout";
 import InitialBillPage from "./pages/initial-bill-page";
 import SplashPage from "./pages/splash-page";
 import FinalBillPage from "./pages/final-bill-page";
+import SearchPage from "./pages/search-page";
+import SettingsPage from "./pages/settings-page";
 
 const Routes: RouteObject[] = [
   {
@@ -34,6 +36,14 @@ const Routes: RouteObject[] = [
           {
             path: "final-bill",
             element: <FinalBillPage />,
+          },
+          {
+            path: "search",
+            element: <SearchPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
           },
         ],
       },

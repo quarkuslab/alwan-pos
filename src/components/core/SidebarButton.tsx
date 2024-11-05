@@ -1,6 +1,7 @@
+import useSystemNavigate from "@/hooks/useSystemNavigate";
 import { cn } from "@/lib/utils";
 import { MouseEvent, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   label: string;
@@ -8,17 +9,14 @@ interface Props {
 }
 
 export default function SidebarButton(props: Props) {
-  const navigate = useNavigate();
   const location = useLocation();
   const isActive = location.pathname.includes(props.href);
-  const shouldReplace =
-    location.pathname.includes("initial-bill") ||
-    location.pathname.includes("final-bill");
+  const navigate = useSystemNavigate();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   function handleClick(e: MouseEvent) {
     e.preventDefault();
-    navigate(props.href, { replace: shouldReplace });
+    navigate(props.href);
     if (buttonRef.current) {
       buttonRef.current.blur();
     }
