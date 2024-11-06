@@ -22,6 +22,7 @@ export default function SearchPage() {
   const isFirstLoad = useRef(true);
   const currentPage = useRef(1);
   const loadingPage = useRef<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const observer = useRef<IntersectionObserver>();
   const lastResultRef = useCallback(
@@ -56,6 +57,16 @@ export default function SearchPage() {
     },
     [isLoading, isLoadingMore, hasMore]
   );
+
+  // Scroll to top function
+  const scrollToTop = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, []);
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -142,12 +153,13 @@ export default function SearchPage() {
     loadingPage.current = null;
     isFirstLoad.current = true;
     debouncedSearch(query);
+    scrollToTop();
 
     return () => {
       debouncedSearch.cancel();
       observer.current?.disconnect();
     };
-  }, [query, debouncedSearch]);
+  }, [query, debouncedSearch, scrollToTop]);
 
   // Effect to load more results when page changes
   useEffect(() => {
@@ -156,7 +168,8 @@ export default function SearchPage() {
     }
   }, [page, loadMore]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(async () => {
+    // First update the state
     setQuery("");
     setResults([]);
     setPage(1);
@@ -164,8 +177,34 @@ export default function SearchPage() {
     loadingPage.current = null;
     setHasMore(true);
     isFirstLoad.current = true;
-    observer.current?.disconnect();
-  };
+
+    // Disconnect the observer
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+
+    // Scroll to top
+    scrollToTop();
+
+    // Perform the empty search
+    if (system.status == "loaded") {
+      try {
+        setIsLoading(true);
+        const response = await BillService.search(system.token, "", {
+          page: 1,
+          limit: ITEMS_PER_PAGE,
+        });
+        setResults(response.bills);
+        setHasMore(response.pagination.hasMore);
+        isFirstLoad.current = false;
+      } catch (error) {
+        console.error("Reset search error:", error);
+      } finally {
+        setIsLoading(false);
+        loadingPage.current = null;
+      }
+    }
+  }, [system, scrollToTop]);
 
   return (
     <div className="w-full flex flex-col h-full">
@@ -186,7 +225,7 @@ export default function SearchPage() {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-y-scroll">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-scroll">
         <div className="w-full max-w-3xl mx-auto space-y-4 p-5">
           {!isLoading && results.length === 0 && query && (
             <div className="text-gray-500">No results found</div>
