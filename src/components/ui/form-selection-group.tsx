@@ -23,7 +23,7 @@ const FormSelectionGroup = React.forwardRef<
     <ToggleGroupPrimitive.Root
       ref={ref}
       className={cn(
-        "flex h-10 items-center justify-center border border-primary-950 rounded-lg overflow-hidden bg-white divide-x divide-primary-950",
+        "flex h-12 w-full items-center justify-center border border-primary-950 rounded-lg overflow-hidden bg-white divide-x divide-primary-950",
         error && "border-red-500",
         className
       )}
@@ -53,7 +53,7 @@ const FormSelectionGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        "data-[state=on]:bg-primary-950 data-[state=on]:text-white px-8 h-full flex items-center justify-center text-base font-medium rounded-r-none [&:last-child]:rounded-l-none",
+        "data-[state=on]:bg-primary-950 data-[state=on]:text-white px-6 h-full w-full flex items-center justify-center text-base font-medium rounded-r-none [&:last-child]:rounded-l-none",
         className
       )}
       {...props}
