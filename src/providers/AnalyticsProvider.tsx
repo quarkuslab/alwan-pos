@@ -1,7 +1,7 @@
 import {
   AnalyticsContext,
-  BillCounts,
-  initialBillCounts,
+  AnalyticsContextType,
+  AnalyticsState,
 } from "@/contexts/analytics.context";
 import { useSystemState } from "@/hooks/useSystem";
 import { BillService } from "@/services/bill.service";
@@ -12,20 +12,21 @@ interface Props {
 }
 
 export default function AnalyticsProvider({ children }: Props) {
-  const [counts, setCounts] = useState<BillCounts>(initialBillCounts);
+  const [state, setState] = useState<AnalyticsState>({ status: "loading" });
   const system = useSystemState();
 
-  const updateCounts = useCallback(async () => {
-    if (system.status == "loaded") {
-      const counts = await BillService.getCounts(system.token);
-      setCounts(counts);
-    }
-  }, [system]);
+  const updateCounts: AnalyticsContextType["updateCounts"] =
+    useCallback(async () => {
+      if (system.status == "loaded") {
+        const counts = await BillService.getCounts(system.token);
+        setState({ status: "loaded", counts });
+      }
+    }, [system]);
 
   return (
     <AnalyticsContext.Provider
       value={{
-        counts,
+        state,
         updateCounts,
       }}
     >

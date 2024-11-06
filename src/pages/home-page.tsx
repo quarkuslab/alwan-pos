@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { useAnalyticsData, useAnalyticsUpdate } from "@/hooks/useAnalytics";
+import { useAnalyticsState, useAnalyticsUpdate } from "@/hooks/useAnalytics";
 import useOnMount from "@/hooks/useOnMount";
 import {
   PieChart,
@@ -17,33 +17,41 @@ import {
 } from "recharts";
 import { Ban, CheckCircle, Timer, Package } from "lucide-react";
 import { useMemo } from "react";
+import Spinner from "@/components/ui/spinner";
 
 export default function HomePage() {
-  const analytics = useAnalyticsData();
+  const analytics = useAnalyticsState();
   const updateAnalytics = useAnalyticsUpdate();
-  const total = useMemo(
-    () =>
-      analytics.paidCount + analytics.cancelledCount + analytics.completedCount,
-    [analytics]
-  );
+  const total = useMemo(() => {
+    if (analytics.status == "loaded") {
+      return (
+        analytics.counts.paidCount +
+        analytics.counts.cancelledCount +
+        analytics.counts.completedCount
+      );
+    }
+    return 0;
+  }, [analytics]);
 
   const statusData = useMemo(
     () => [
       {
         name: "Active",
-        value: analytics.paidCount,
+        value: analytics.status == "loaded" ? analytics.counts.paidCount : 0,
         color: "#0ea5e9",
         description: "Services currently with customers",
       },
       {
         name: "Cancelled",
-        value: analytics.cancelledCount,
+        value:
+          analytics.status == "loaded" ? analytics.counts.cancelledCount : 0,
         color: "#ef4444",
         description: "Services cancelled before use",
       },
       {
         name: "Completed",
-        value: analytics.completedCount,
+        value:
+          analytics.status == "loaded" ? analytics.counts.completedCount : 0,
         color: "#22c55e",
         description: "Services returned by customers",
       },
@@ -53,13 +61,31 @@ export default function HomePage() {
 
   useOnMount(updateAnalytics);
 
-  const activeRate = (
-    (analytics.completedCount / (total - analytics.cancelledCount)) *
-    100
-  ).toFixed(1);
-  const cancellationRate = ((analytics.cancelledCount / total) * 100).toFixed(
-    1
-  );
+  const activeRate = useMemo(() => {
+    if (analytics.status == "loaded") {
+      return (
+        (analytics.counts.completedCount /
+          (total - analytics.counts.cancelledCount)) *
+        100
+      ).toFixed(1);
+    }
+    return "0";
+  }, [analytics, total]);
+
+  const cancellationRate = useMemo(() => {
+    if (analytics.status == "loaded") {
+      return ((analytics.counts.cancelledCount / total) * 100).toFixed(1);
+    }
+    return "0";
+  }, [analytics, total]);
+
+  if (analytics.status == "loading") {
+    return (
+      <div className="h-[calc(100vh-5rem)] flex flex-col items-center justify-center">
+        <Spinner size={30} />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl py-5">
@@ -75,7 +101,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-700">
-                {analytics.paidCount}
+                {analytics.counts.paidCount}
               </div>
               <p className="text-xs text-blue-600">
                 Services currently with customers
@@ -93,7 +119,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-700">
-                {analytics.completedCount}
+                {analytics.counts.completedCount}
               </div>
               <p className="text-xs text-green-600">
                 Completion rate: {activeRate}%
@@ -111,7 +137,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-700">
-                {analytics.cancelledCount}
+                {analytics.counts.cancelledCount}
               </div>
               <p className="text-xs text-red-600">
                 Cancellation rate: {cancellationRate}%

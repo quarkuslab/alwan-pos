@@ -12,12 +12,21 @@ export const initialBillCounts: BillCounts = {
   completedCount: 0,
 };
 
-interface AnalyticsContextType {
-  counts: BillCounts;
+export type AnalyticsState =
+  | {
+      status: "loading";
+    }
+  | {
+      status: "loaded";
+      counts: BillCounts;
+    };
+
+export type AnalyticsContextType = {
+  state: AnalyticsState;
   updateCounts: () => void;
-}
+};
 
 export const AnalyticsContext = createContext<AnalyticsContextType>({
-  counts: initialBillCounts,
+  state: { status: "loading" },
   updateCounts: () => {},
 });
