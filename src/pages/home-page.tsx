@@ -30,7 +30,7 @@ export default function HomePage() {
   const statusData = useMemo(
     () => [
       {
-        name: "Active Services",
+        name: "Active",
         value: analytics.paidCount,
         color: "#0ea5e9",
         description: "Services currently with customers",
