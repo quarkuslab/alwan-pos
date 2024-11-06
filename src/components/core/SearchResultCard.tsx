@@ -52,7 +52,7 @@ export default function SearchResultCard({
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-2xl font-bold">
-                AED {(bill.amountPaid ?? 0).toFixed(2)}
+                AED {(bill.paidAmount ?? 0).toFixed(2)}
               </span>
             </div>
             <div className="mt-3">

@@ -14,6 +14,7 @@ export interface SystemService {
   pricePerHour: number;
   description: string | null;
   isActive: boolean;
+  hasFulldayCalculation: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,7 +46,7 @@ export const SystemService = {
   },
 
   async getServices(token: string): Promise<SystemService[]> {
-    const res = await client.get("/services", {
+    const res = await client.get("/operations/counter/services", {
       headers: {
         "X-Counter-Token": token,
       },

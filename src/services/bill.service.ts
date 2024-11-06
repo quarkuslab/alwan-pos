@@ -10,11 +10,13 @@ export interface InitialBill {
   customerName: string;
   customerPhone: string | null;
   startTime: Date;
-  amountPaid: number;
+  paidAmount: number;
   paymentMethod: "cash" | "card";
   id: number;
   orderNo: string;
   counterId: string;
+  quantity: number;
+  isFullday: boolean;
 }
 
 export interface SearchResultBill extends InitialBill {
@@ -27,6 +29,8 @@ export interface CreateInitialBillData {
   remarks?: string;
   paymentMethod: "cash" | "card";
   time: Date;
+  quantity: number;
+  isFullday: boolean;
   service: SystemService;
 }
 
@@ -53,8 +57,11 @@ export const BillService = {
         customerName: opts.data.customerName,
         customerPhone: opts.data.customerPhone,
         startTime: opts.data.time,
-        amountPaid: opts.data.service.advanceAmount,
+        paidAmount: opts.data.service.advanceAmount,
         paymentMethod: opts.data.paymentMethod,
+        quantity: opts.data.quantity,
+        isFullday: opts.data.isFullday,
+        remarks: opts.data.remarks,
       },
       {
         headers: {
@@ -74,7 +81,7 @@ export const BillService = {
       orderDate: formatDateForBill(initialBill.startTime),
       customerName: initialBill.customerName,
       customerNumber: initialBill.customerPhone || "",
-      advance: initialBill.amountPaid,
+      advance: initialBill.paidAmount,
       termsAndConditions: [
         "1.Shopping Trolley AED 10/HR and AED 50/Unit Limited.",
         "2.Baby Cart Single AED 15/HR and AED 75/Unit Limited.",
