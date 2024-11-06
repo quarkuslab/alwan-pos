@@ -22,7 +22,7 @@ import { displayAmount } from "@/utils/amount";
 import { CircleDollarSign, Clock, CreditCard } from "lucide-react";
 import { CreateInitialBillData } from "@/services/bill.service";
 import { SystemService } from "@/services/system.service";
-import { forwardRef, useCallback, useImperativeHandle } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
 interface Props {
   service: SystemService;
@@ -42,17 +42,27 @@ const formSchema = z.object({
 
 const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
   const time = useTime();
+  const toggleGroupRef = useRef<HTMLDivElement>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       phone: "",
       remarks: "",
+      payment: undefined,
     },
   });
 
   const resetForm = useCallback(() => {
     form.reset();
+    // Force reset the toggle group items' data-state
+    if (toggleGroupRef.current) {
+      const items = toggleGroupRef.current.querySelectorAll("[data-state]");
+      items.forEach((item) => {
+        item.setAttribute("data-state", "off");
+      });
+    }
   }, [form]);
 
   useImperativeHandle(ref, () => ({
@@ -131,6 +141,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
                   <FormLabel>Payment</FormLabel>
                   <FormControl>
                     <FormSelectionGroup
+                      ref={toggleGroupRef}
                       type="single"
                       value={field.value}
                       onValueChange={field.onChange}
@@ -169,7 +180,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
           </div>
           <div>
             <Button type="submit" size="lg">
-              Print Reciept
+              Print Receipt
             </Button>
           </div>
         </div>
