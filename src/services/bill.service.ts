@@ -2,6 +2,7 @@ import client from "@/lib/client";
 import PrinterService from "./printer.service";
 import { formatDateForBill } from "@/utils/time";
 import { SystemCounter, SystemService } from "./system.service";
+import { BillCounts } from "@/contexts/analytics.context";
 
 export interface InitialBill {
   status: "paid" | "cancelled" | "completed";
@@ -113,5 +114,14 @@ export const BillService = {
         },
       }
     );
+  },
+
+  async getCounts(token: string): Promise<BillCounts> {
+    const res = await client.get("/operations/counter/analytics", {
+      headers: {
+        "X-Counter-Token": token,
+      },
+    });
+    return res.data.counts;
   },
 };

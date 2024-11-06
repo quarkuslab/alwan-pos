@@ -1,4 +1,5 @@
 import { OperationsContext } from "@/contexts/operations.context";
+import { useAnalyticsUpdate } from "@/hooks/useAnalytics";
 import { useAsyncToast } from "@/hooks/useAsyncToast";
 import { useSystemState } from "@/hooks/useSystem";
 import { BillService, CreateInitialBillData } from "@/services/bill.service";
@@ -10,6 +11,7 @@ interface Props {
 
 export default function OperationsProvider({ children }: Props) {
   const system = useSystemState();
+  const updateAnalytics = useAnalyticsUpdate();
   const toast = useAsyncToast();
 
   const createInitialBill = useCallback(
@@ -26,9 +28,10 @@ export default function OperationsProvider({ children }: Props) {
           success: "Bill Printed Successfully",
         });
         await promise;
+        await updateAnalytics();
       }
     },
-    [system, toast]
+    [system, toast, updateAnalytics]
   );
 
   const cancelBill = useCallback(
@@ -42,9 +45,10 @@ export default function OperationsProvider({ children }: Props) {
           error: () => "Bill Cancellation failed",
         });
         await promise;
+        await updateAnalytics();
       }
     },
-    [system, toast]
+    [system, toast, updateAnalytics]
   );
 
   return (

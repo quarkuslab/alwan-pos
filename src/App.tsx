@@ -6,6 +6,7 @@ import OperationsProvider from "./providers/OperationsProvider";
 import SystemProvider from "./providers/SystemProvider";
 import { Fragment } from "react/jsx-runtime";
 import { Toaster } from "./components/ui/toaster";
+import AnalyticsProvider from "./providers/AnalyticsProvider";
 
 export default function App() {
   return (
@@ -13,11 +14,13 @@ export default function App() {
       <Toaster />
       <TimeProvider>
         <SystemProvider>
-          <OperationsProvider>
-            <NuqsAdapter>
-              <RouterProvider router={createHashRouter(Routes)} />
-            </NuqsAdapter>
-          </OperationsProvider>
+          <AnalyticsProvider>
+            <OperationsProvider>
+              <NuqsAdapter>
+                <RouterProvider router={createHashRouter(Routes)} />
+              </NuqsAdapter>
+            </OperationsProvider>
+          </AnalyticsProvider>
         </SystemProvider>
       </TimeProvider>
     </Fragment>
