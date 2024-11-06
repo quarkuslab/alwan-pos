@@ -30,6 +30,16 @@ export interface CreateInitialBillData {
   service: SystemService;
 }
 
+interface PaginatedSearchResponse {
+  bills: SearchResultBill[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    hasMore: boolean;
+  };
+}
+
 export const BillService = {
   async createInitialBill(opts: {
     token: string;
@@ -87,21 +97,32 @@ export const BillService = {
     return res.data.initialBill;
   },
 
-  async search(token: string, query: string): Promise<SearchResultBill[]> {
+  async search(
+    token: string,
+    query: string,
+    params: { page: number; limit: number }
+  ): Promise<PaginatedSearchResponse> {
     const res = await client.post(
       "/operations/counter/search",
-      { query },
+      {
+        query,
+        page: params.page,
+        limit: params.limit,
+      },
       {
         headers: {
           "X-Counter-Token": token,
         },
       }
     );
-    return res.data.bills.map(
-      (bill: object) =>
-        // @ts-expect-error ignore conversion errors
-        ({ ...bill, startTime: new Date(bill.startTime) } as SearchResultBill)
-    );
+    const data = res.data as PaginatedSearchResponse;
+    return {
+      ...data,
+      bills: data.bills.map((bill) => ({
+        ...bill,
+        startTime: new Date(bill.startTime),
+      })),
+    };
   },
 
   async cancelBill(token: string, billId: number): Promise<void> {

@@ -7,6 +7,9 @@ interface Props {
   icon: ComponentType;
   href?: string;
   onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+  iconClassName?: string;
 }
 
 export default function IconButton(props: Props) {
@@ -18,9 +21,11 @@ export default function IconButton(props: Props) {
 
   return (
     <button
+      disabled={props.disabled}
       className={cn(
         defaultStyles,
-        match && "bg-primary-950 hover:bg-primary-950 text-white"
+        match && "bg-primary-950 hover:bg-primary-950 text-white",
+        props.className
       )}
       onClick={(e) => {
         e.preventDefault();
@@ -36,7 +41,9 @@ export default function IconButton(props: Props) {
       }}
       ref={buttonRef}
     >
-      <props.icon />
+      <span className={cn(props.iconClassName)}>
+        <props.icon />
+      </span>
     </button>
   );
 }
