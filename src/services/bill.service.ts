@@ -32,6 +32,7 @@ export interface CreateInitialBillData {
   quantity: number;
   isFullday: boolean;
   service: SystemService;
+  paidAmount: number;
 }
 
 interface PaginatedSearchResponse {
@@ -44,7 +45,57 @@ interface PaginatedSearchResponse {
   };
 }
 
+export interface CompleteBillRequest {
+  orderNo: string;
+  endTime: Date;
+  balanceAmount: number;
+  billedHours: number;
+}
+
+interface FinalBill {
+  id: number;
+  orderNo: string;
+  endTime: Date;
+  balanceAmount: number;
+  billedHours: number;
+}
+
+export interface CompleteBill {
+  id: number;
+  orderNo: string;
+  customerName: string;
+  customerPhone: string | null;
+  startTime: Date;
+  paidAmount: number;
+  isFullday: boolean;
+  quantity: number;
+  paymentMethod: "cash" | "card";
+  status: "paid" | "cancelled" | "completed";
+  remarks: string | null;
+
+  counter: SystemCounter;
+  service: SystemService;
+  finalBill: FinalBill;
+}
+
 export const BillService = {
+  async completeBill(token: string, data: CompleteBillRequest) {
+    const res = await client.post("/operations/counter/complete-bill", data, {
+      headers: {
+        "X-Counter-Token": token,
+      },
+    });
+    const bill: CompleteBill = {
+      ...res.data,
+      startTime: new Date(res.data.startTime),
+      finalBill: {
+        ...res.data.finalBill,
+        endTime: new Date(res.data.finalBill.endTime),
+      },
+    };
+    await PrinterService.printCompleteBill(bill);
+  },
+
   async createInitialBill(opts: {
     token: string;
     counter: SystemCounter;
@@ -57,7 +108,7 @@ export const BillService = {
         customerName: opts.data.customerName,
         customerPhone: opts.data.customerPhone,
         startTime: opts.data.time,
-        paidAmount: opts.data.service.advanceAmount,
+        paidAmount: opts.data.paidAmount,
         paymentMethod: opts.data.paymentMethod,
         quantity: opts.data.quantity,
         isFullday: opts.data.isFullday,
@@ -151,5 +202,17 @@ export const BillService = {
       },
     });
     return res.data.counts;
+  },
+
+  async getBillData(token: string, orderNo: string): Promise<SearchResultBill> {
+    const res = await client.get(`/operations/counter/bill-data/${orderNo}`, {
+      headers: {
+        "X-Counter-Token": token,
+      },
+    });
+    return {
+      ...res.data.bill,
+      startTime: new Date(res.data.bill.startTime),
+    };
   },
 };

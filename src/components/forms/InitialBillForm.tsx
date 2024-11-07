@@ -19,7 +19,6 @@ import {
   FormSelectionGroup,
   FormSelectionGroupItem,
 } from "../ui/form-selection-group";
-import { displayAmount } from "@/utils/amount";
 import {
   CircleDollarSign,
   Clock,
@@ -38,6 +37,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { formatAmount } from "@/utils/amount";
 
 interface Props {
   service: SystemService;
@@ -72,12 +72,10 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
     },
   });
 
-  const total = useMemo(() => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "AED",
-    }).format(quantity * props.service.advanceAmount);
-  }, [quantity, props.service]);
+  const total = useMemo(
+    () => quantity * props.service.advanceAmount,
+    [quantity, props.service]
+  );
 
   const resetForm = useCallback(() => {
     form.reset();
@@ -113,6 +111,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
       paymentMethod: values.payment,
       service: props.service,
       isFullday: values.fullDay,
+      paidAmount: total,
     });
   }
 
@@ -275,13 +274,13 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
         {/* Rest of the form remains the same */}
         <div className="bg-white border border-primary-950 rounded-md flex items-center justify-between p-10">
           <div className="text-2xl font-bold">AMOUNT TO BE PAID:</div>
-          <div className="text-4xl font-bold">{total}</div>
+          <div className="text-4xl font-bold">{formatAmount(total)}</div>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="text-lg font-medium">PRICE PER HOUR:</div>
             <div className="text-2xl font-bold ml-20">
-              AED {displayAmount(props.service.pricePerHour)}
+              {formatAmount(props.service.pricePerHour)}
             </div>
           </div>
           <div>

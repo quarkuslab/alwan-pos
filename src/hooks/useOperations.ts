@@ -8,3 +8,7 @@ export function useCreateInitialBillOperation() {
 export function useCancelBillOperation() {
   return useContext(OperationsContext).cancelBill;
 }
+
+export function useCompleteBillOperation() {
+  return useContext(OperationsContext).completeBill;
+}

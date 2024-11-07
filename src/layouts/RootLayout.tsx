@@ -17,7 +17,7 @@ export default function RootLayout() {
     barcodeLength: 16,
     barcodeTimeout: 100,
     onScan: (barcode) => {
-      navigate(`/app/final-bill?barcode=${barcode}`);
+      navigate(`/app/final-bill?orderNo=${barcode}`);
     },
   });
 

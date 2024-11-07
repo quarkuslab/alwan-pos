@@ -2,7 +2,11 @@ import { OperationsContext } from "@/contexts/operations.context";
 import { useAnalyticsUpdate } from "@/hooks/useAnalytics";
 import { useAsyncToast } from "@/hooks/useAsyncToast";
 import { useSystemState } from "@/hooks/useSystem";
-import { BillService, CreateInitialBillData } from "@/services/bill.service";
+import {
+  BillService,
+  CompleteBillRequest,
+  CreateInitialBillData,
+} from "@/services/bill.service";
 import { ReactNode, useCallback } from "react";
 
 interface Props {
@@ -51,11 +55,27 @@ export default function OperationsProvider({ children }: Props) {
     [system, toast, updateAnalytics]
   );
 
+  const completeBill = useCallback(
+    async (data: CompleteBillRequest) => {
+      if (system.status == "loaded") {
+        const promise = BillService.completeBill(system.token, data);
+        toast({
+          promise,
+          loading: "Completing bill...",
+          success: "Bill completed successfully",
+          error: () => "Bill Completion failed",
+        });
+      }
+    },
+    [system, toast]
+  );
+
   return (
     <OperationsContext.Provider
       value={{
         createInitialBill,
         cancelBill,
+        completeBill,
       }}
     >
       {children}
