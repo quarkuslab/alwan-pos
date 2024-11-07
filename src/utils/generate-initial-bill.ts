@@ -68,7 +68,7 @@ export function generateInitialBill(data: CompleteBill): string {
     data.service.calculationMethod === "balance"
       ? justifyBetween(
           "Deposit Required:",
-          `AED ${formatCurrency(data.service.advanceAmount)}`
+          `AED ${formatCurrency(data.paidAmount)}`
         )
       : "",
     createSeparator(),
