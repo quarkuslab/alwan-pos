@@ -1,19 +1,20 @@
 declare global {
   interface Window {
     PrinterBridge?: {
-      printText: (text: string) => Promise<void>
+      printLogo: () => Promise<void>;
+      printText: (text: string) => Promise<void>;
       printBarcode: (data: string) => Promise<void>;
-      cutPaper: () => Promise<void>
+      cutPaper: () => Promise<void>;
       getPrinterStatus: () => Promise<number>;
-    }
+    };
     SettingsBridge?: {
-      saveString: (key: string, value: string) => Promise<void>
-      getString: (key: string) => Promise<string | null>
-      hasKey: (key: string) => Promise<boolean>
-      remove: (key: string) => Promise<void>
-      clear: () => Promise<void>
-    }
+      saveString: (key: string, value: string) => Promise<void>;
+      getString: (key: string) => Promise<string | null>;
+      hasKey: (key: string) => Promise<boolean>;
+      remove: (key: string) => Promise<void>;
+      clear: () => Promise<void>;
+    };
   }
 }
 
-export { }
+export {};

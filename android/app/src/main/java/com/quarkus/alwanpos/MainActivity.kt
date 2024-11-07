@@ -1,6 +1,10 @@
 package com.quarkus.alwanpos
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.AssetManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +20,7 @@ import androidx.webkit.WebViewAssetLoader
 import com.sunmi.peripheral.printer.InnerPrinterCallback
 import com.sunmi.peripheral.printer.InnerPrinterManager
 import com.sunmi.peripheral.printer.SunmiPrinterService
+import java.io.IOException
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
@@ -105,6 +110,80 @@ class MainActivity : ComponentActivity() {
     }
 
     inner class PrinterBridge {
+        private val context: Context = this@MainActivity
+
+        @JavascriptInterface
+        fun printLogo() {
+            try {
+                val assetManager: AssetManager = context.assets
+
+                assetManager.open("www/logo.jpg").use { inputStream ->
+                    var bitmap = BitmapFactory.decodeStream(inputStream)
+
+                    // Preprocess the bitmap for better printing
+                    bitmap = preprocessBitmap(bitmap)
+
+                    // Scale the bitmap
+                    val scaledBitmap = scaleBitmap(bitmap, 384)
+
+                    printerService?.apply {
+                        setAlignment(1, null)
+                        // Use black/white mode with preprocessed image
+                        printBitmapCustom(scaledBitmap, 1, null)
+                        lineWrap(1, null)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        private fun preprocessBitmap(original: Bitmap): Bitmap {
+            // Create a mutable copy of the bitmap
+            val processed = original.copy(Bitmap.Config.ARGB_8888, true)
+
+            // Get pixel array
+            val pixels = IntArray(processed.width * processed.height)
+            processed.getPixels(pixels, 0, processed.width, 0, 0, processed.width, processed.height)
+
+            // Process each pixel
+            for (i in pixels.indices) {
+                val pixel = pixels[i]
+                // Convert to grayscale using luminance formula
+                val gray = (0.299 * android.graphics.Color.red(pixel) +
+                        0.587 * android.graphics.Color.green(pixel) +
+                        0.114 * android.graphics.Color.blue(pixel)).toInt()
+
+                // Apply threshold (adjust this value if needed)
+                val threshold = 127
+                val finalColor = if (gray > threshold) {
+                    android.graphics.Color.WHITE
+                } else {
+                    android.graphics.Color.BLACK
+                }
+
+                pixels[i] = finalColor
+            }
+
+            // Set processed pixels back to bitmap
+            processed.setPixels(pixels, 0, processed.width, 0, 0, processed.width, processed.height)
+            return processed
+        }
+
+        private fun scaleBitmap(originalBitmap: Bitmap, maxWidth: Int): Bitmap {
+            val width = originalBitmap.width
+            val height = originalBitmap.height
+
+            if (width <= maxWidth) {
+                return originalBitmap
+            }
+
+            val ratio = maxWidth.toFloat() / width.toFloat()
+            val newHeight = (height * ratio).toInt()
+
+            return Bitmap.createScaledBitmap(originalBitmap, maxWidth, newHeight, true)
+        }
+
         @JavascriptInterface
         fun printText(text: String) {
             try {

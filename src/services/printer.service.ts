@@ -21,6 +21,7 @@ const PrinterService = {
   async printInitialBill(bill: CompleteBill) {
     if (window.PrinterBridge) {
       const text = generateInitialBill(bill);
+      await window.PrinterBridge.printLogo();
       await window.PrinterBridge.printText(text);
       await window.PrinterBridge.printBarcode(bill.orderNo);
       await window.PrinterBridge.cutPaper();
