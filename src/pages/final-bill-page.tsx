@@ -4,7 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
+  // CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,7 +23,7 @@ import { useSystemState } from "@/hooks/useSystem";
 import { isAxiosError } from "axios";
 import { formatAmount } from "@/utils/amount";
 import {
-  useCancelBillOperation,
+  // useCancelBillOperation,
   useCompleteBillOperation,
 } from "@/hooks/useOperations";
 import useTime from "@/hooks/useTime";
@@ -36,7 +36,7 @@ interface PageError {
 export default function FinalBillPage() {
   const time = useTime();
   const system = useSystemState();
-  const cancelBill = useCancelBillOperation();
+  // const cancelBill = useCancelBillOperation();
   const completeBill = useCompleteBillOperation();
   const [orderNo, setOrderNo] = useQueryState("orderNo", { defaultValue: "" });
   const [manualOrderNo, setManualOrderNo] = useState("");
@@ -123,10 +123,10 @@ export default function FinalBillPage() {
     });
   }, [time, billCalculation, billData, system, completeBill]);
 
-  const handleCancelBill = useCallback(() => {
-    if (!billData) return;
-    cancelBill(billData.id);
-  }, [billData, cancelBill]);
+  // const handleCancelBill = useCallback(() => {
+  //   if (!billData) return;
+  //   cancelBill(billData.id);
+  // }, [billData, cancelBill]);
 
   const getStatusColor = (status: InitialBill["status"]) => {
     switch (status) {
@@ -329,7 +329,8 @@ export default function FinalBillPage() {
             </div>
           </div>
         </CardContent>
-        {billData.status == "paid" ? (
+        <Button onClick={handleCompleteBill}>Complete Bill</Button>
+        {/* {billData.status == "paid" ? (
           <CardFooter className="flex justify-end">
             {billCalculation.billableHours > 0 ? (
               <Button onClick={handleCompleteBill}>Complete Bill</Button>
@@ -339,7 +340,7 @@ export default function FinalBillPage() {
               </Button>
             )}
           </CardFooter>
-        ) : null}
+        ) : null} */}
       </Card>
     </div>
   );

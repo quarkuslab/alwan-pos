@@ -1,7 +1,7 @@
 import { CompleteBill } from "@/services/bill.service";
 
 export function generateCompleteBill(bill: CompleteBill): string {
-  const LINE_WIDTH = 80;
+  const LINE_WIDTH = 48;
 
   // Helper function to center text
   function centerText(text: string): string {

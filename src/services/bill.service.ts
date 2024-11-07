@@ -1,8 +1,12 @@
 import client from "@/lib/client";
 import PrinterService from "./printer.service";
-import { formatDateForBill } from "@/utils/time";
 import { SystemCounter, SystemService } from "./system.service";
 import { BillCounts } from "@/contexts/analytics.context";
+
+export interface CreateInitialBillResponse extends InitialBill {
+  counter: SystemCounter;
+  service: SystemService;
+}
 
 export interface InitialBill {
   status: "paid" | "cancelled" | "completed";
@@ -16,6 +20,7 @@ export interface InitialBill {
   orderNo: string;
   counterId: string;
   quantity: number;
+  remarks: string | null;
   isFullday: boolean;
 }
 
@@ -86,14 +91,14 @@ export const BillService = {
       },
     });
     const bill: CompleteBill = {
-      ...res.data,
-      startTime: new Date(res.data.startTime),
+      ...res.data.bill,
+      startTime: new Date(res.data.bill.startTime),
       finalBill: {
-        ...res.data.finalBill,
-        endTime: new Date(res.data.finalBill.endTime),
+        ...res.data.bill.finalBill,
+        endTime: new Date(res.data.bill.finalBill.endTime),
       },
     };
-    await PrinterService.printCompleteBill(bill);
+    return bill;
   },
 
   async createInitialBill(opts: {
@@ -120,39 +125,11 @@ export const BillService = {
         },
       }
     );
-    const initialBill: InitialBill = {
+    const initialBill: CreateInitialBillResponse = {
       ...res.data.initialBill,
       startTime: new Date(res.data.initialBill.startTime),
     };
-    await PrinterService.print({
-      companyName: "Alwan Alqarya Exhibition Organizing",
-      companyAddress: opts.counter.name,
-      contactInfo: opts.counter.contactInfo,
-      orderNo: initialBill.orderNo,
-      orderDate: formatDateForBill(initialBill.startTime),
-      customerName: initialBill.customerName,
-      customerNumber: initialBill.customerPhone || "",
-      advance: initialBill.paidAmount,
-      termsAndConditions: [
-        "1.Shopping Trolley AED 10/HR and AED 50/Unit Limited.",
-        "2.Baby Cart Single AED 15/HR and AED 75/Unit Limited.",
-        "3.Baby Cart Double AED 25/HR and AED 100/Unit Limited.",
-        "4.Wheel Chair AED 10/HR.",
-        "5.Electric Wheel Chair 50 10/HR and AED 200/Unlimited.",
-        "6.Electric Scooter AED 50/HR and AED 250/Unit Limited.",
-        "7.Maximum Grace Period is 15 Minutes.",
-      ],
-      items: [
-        {
-          name: opts.data.service.title,
-          qty: 1,
-          uom: "NOS",
-          price: opts.data.service.pricePerHour,
-          value: opts.data.service.pricePerHour,
-        },
-      ],
-    });
-    return res.data.initialBill;
+    return initialBill;
   },
 
   async search(

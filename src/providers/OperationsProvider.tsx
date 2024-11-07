@@ -63,7 +63,7 @@ export default function OperationsProvider({ children }: Props) {
           promise,
           loading: "Completing bill...",
           success: "Bill completed successfully",
-          error: () => "Bill Completion failed",
+          error: (e) => String(e),
         });
       }
     },
