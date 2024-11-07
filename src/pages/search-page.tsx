@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { BillService, SearchResultBill } from "@/services/bill.service";
+import { BillService } from "@/services/bill.service";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 import SearchResultCard from "@/components/core/SearchResultCard";
@@ -7,6 +7,7 @@ import { useSystemState } from "@/hooks/useSystem";
 import IconButton from "@/components/core/IconButton";
 import { Loader2, RotateCw } from "lucide-react";
 import { useCancelBillOperation } from "@/hooks/useOperations";
+import { SearchResultBill } from "@/types/bill";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -77,10 +78,14 @@ export default function SearchPage() {
           currentPage.current = 1;
           loadingPage.current = 1;
           isFirstLoad.current = true;
-          const response = await BillService.search(system.token, searchQuery, {
-            page: 1,
-            limit: ITEMS_PER_PAGE,
-          });
+          const response = await BillService.searchBills(
+            system.token,
+            searchQuery,
+            {
+              page: 1,
+              limit: ITEMS_PER_PAGE,
+            }
+          );
           setResults(response.bills);
           setHasMore(response.pagination.hasMore);
           isFirstLoad.current = false;
@@ -105,7 +110,7 @@ export default function SearchPage() {
     ) {
       try {
         setIsLoadingMore(true);
-        const response = await BillService.search(system.token, query, {
+        const response = await BillService.searchBills(system.token, query, {
           page: loadingPage.current,
           limit: ITEMS_PER_PAGE,
         });
@@ -190,7 +195,7 @@ export default function SearchPage() {
     if (system.status == "loaded") {
       try {
         setIsLoading(true);
-        const response = await BillService.search(system.token, "", {
+        const response = await BillService.searchBills(system.token, "", {
           page: 1,
           limit: ITEMS_PER_PAGE,
         });

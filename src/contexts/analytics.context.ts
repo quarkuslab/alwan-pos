@@ -1,10 +1,5 @@
+import { BillCounts } from "@/types/system";
 import { createContext } from "react";
-
-export interface BillCounts {
-  paidCount: number;
-  cancelledCount: number;
-  completedCount: number;
-}
 
 export const initialBillCounts: BillCounts = {
   paidCount: 0,

@@ -14,11 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Clock, ArrowRight, RefreshCcw } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import {
-  BillService,
-  InitialBill,
-  SearchResultBill,
-} from "@/services/bill.service";
+import { BillService } from "@/services/bill.service";
 import { useSystemState } from "@/hooks/useSystem";
 import { isAxiosError } from "axios";
 import { formatAmount } from "@/utils/amount";
@@ -27,6 +23,7 @@ import {
   useCompleteBillOperation,
 } from "@/hooks/useOperations";
 import useTime from "@/hooks/useTime";
+import { InitialBill, SearchResultBill } from "@/types/bill";
 
 interface PageError {
   type: "not_found" | "error";

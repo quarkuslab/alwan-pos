@@ -2,7 +2,7 @@ import InitialBillConfirmationDialog from "@/components/core/InitialBillConfirma
 import InitialBillForm from "@/components/forms/InitialBillForm";
 import { useCreateInitialBillOperation } from "@/hooks/useOperations";
 import { useSystemState } from "@/hooks/useSystem";
-import { CreateInitialBillData } from "@/services/bill.service";
+import { CreateInitialBillRequest } from "@/types/bill";
 import {
   ComponentRef,
   Fragment,
@@ -15,7 +15,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 
 export default function InitialBillPage() {
-  const [data, setData] = useState<CreateInitialBillData | null>(null);
+  const [data, setData] = useState<CreateInitialBillRequest | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const system = useSystemState();
@@ -36,7 +36,7 @@ export default function InitialBillPage() {
   }, [system, params]);
 
   const handleSubmit = useCallback(
-    (data: CreateInitialBillData) => {
+    (data: CreateInitialBillRequest) => {
       navigate("confirm");
       setData(data);
     },
@@ -44,7 +44,7 @@ export default function InitialBillPage() {
   );
 
   const handleConfirm = useCallback(
-    async (data: CreateInitialBillData) => {
+    async (data: CreateInitialBillRequest) => {
       navigate(-1);
       await createInitialBill(data);
       formRef.current?.reset();
@@ -66,6 +66,7 @@ export default function InitialBillPage() {
     <Fragment>
       <InitialBillConfirmationDialog
         data={data}
+        service={service}
         onClose={closeConfirmationDialog}
         onConfirm={handleConfirm}
       />

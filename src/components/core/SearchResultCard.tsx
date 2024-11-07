@@ -1,9 +1,9 @@
 import { User, Phone, CreditCard, Clock } from "lucide-react";
 import { displayTime } from "@/utils/time";
-import { SearchResultBill } from "@/services/bill.service";
 import { Card, CardContent } from "../ui/card";
 import HighlightText from "../ui/highlight";
 import { Button } from "../ui/button";
+import { SearchResultBill } from "@/types/bill";
 
 interface Props {
   searchQuery: string;

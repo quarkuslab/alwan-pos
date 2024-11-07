@@ -22,15 +22,22 @@ import {
   Timer,
   DollarSign,
 } from "lucide-react";
-import { CreateInitialBillData } from "@/services/bill.service";
+import { CreateInitialBillRequest } from "@/types/bill";
+import { Service } from "@/types/system";
 
 interface Props {
-  data: CreateInitialBillData | null;
+  data: CreateInitialBillRequest | null;
+  service: Service;
   onClose: () => void;
-  onConfirm: (data: CreateInitialBillData) => void;
+  onConfirm: (data: CreateInitialBillRequest) => void;
 }
 
-const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
+const BillingConfirmationDialog = ({
+  service,
+  data,
+  onClose,
+  onConfirm,
+}: Props) => {
   const isOpen = useMemo(() => !!data, [data]);
 
   const handleOpenChange = useCallback(
@@ -59,8 +66,8 @@ const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
     }).format(new Date(date));
   };
 
-  const calculateTotal = (data: CreateInitialBillData) => {
-    return data.service.advanceAmount * data.quantity;
+  const calculateTotal = (data: CreateInitialBillRequest) => {
+    return service.advanceAmount * data.quantity;
   };
 
   if (!data) return null;
@@ -124,7 +131,7 @@ const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-2" />
                   <span className="text-sm text-muted-foreground">
-                    {displayTime(data.time)}
+                    {displayTime(data.startTime)}
                   </span>
                 </div>
               </CardContent>
@@ -134,7 +141,7 @@ const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
               <CardContent className="space-y-3 pt-5">
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Service</span>
-                  <span className="font-medium">{data.service.title}</span>
+                  <span className="font-medium">{service.title}</span>
                 </div>
                 <Separator className="my-3" />
 
@@ -148,7 +155,7 @@ const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
                         </span>
                       </div>
                       <span className="font-medium">
-                        {displayAmount(data.service.pricePerHour)}
+                        {displayAmount(service.pricePerHour)}
                       </span>
                     </div>
                   )}
@@ -183,7 +190,7 @@ const BillingConfirmationDialog = ({ data, onClose, onConfirm }: Props) => {
                       </span>
                     </div>
                     <span className="font-medium">
-                      {displayAmount(data.service.advanceAmount)}
+                      {displayAmount(service.advanceAmount)}
                     </span>
                   </div>
                 </div>

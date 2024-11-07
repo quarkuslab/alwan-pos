@@ -27,8 +27,6 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { CreateInitialBillData } from "@/services/bill.service";
-import { SystemService } from "@/services/system.service";
 import {
   forwardRef,
   useCallback,
@@ -38,10 +36,12 @@ import {
   useState,
 } from "react";
 import { formatAmount } from "@/utils/amount";
+import { Service } from "@/types/system";
+import { CreateInitialBillRequest } from "@/types/bill";
 
 interface Props {
-  service: SystemService;
-  onSubmit: (data: CreateInitialBillData) => void;
+  service: Service;
+  onSubmit: (data: CreateInitialBillRequest) => void;
 }
 
 interface Methods {
@@ -103,15 +103,15 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     props.onSubmit({
-      time,
+      startTime: time,
       quantity,
       customerName: values.name,
       customerPhone: values.phone,
       remarks: values.remarks,
       paymentMethod: values.payment,
-      service: props.service,
       isFullday: values.fullDay,
       paidAmount: total,
+      serviceId: props.service.id,
     });
   }
 

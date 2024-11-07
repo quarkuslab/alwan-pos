@@ -1,4 +1,4 @@
-import { CompleteBill } from "@/services/bill.service";
+import { CompleteBill } from "@/types/bill";
 
 export function generateCompleteBill(bill: CompleteBill): string {
   const LINE_WIDTH = 48;

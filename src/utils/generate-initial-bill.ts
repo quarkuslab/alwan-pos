@@ -1,6 +1,6 @@
-import { CreateInitialBillResponse } from "@/services/bill.service";
+import { CompleteBill } from "@/types/bill";
 
-export function generateInitialBill(data: CreateInitialBillResponse): string {
+export function generateInitialBill(data: CompleteBill): string {
   const LINE_WIDTH = 48;
 
   // Helper function to center text

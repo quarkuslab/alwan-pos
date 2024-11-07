@@ -2,11 +2,12 @@ import { OperationsContext } from "@/contexts/operations.context";
 import { useAnalyticsUpdate } from "@/hooks/useAnalytics";
 import { useAsyncToast } from "@/hooks/useAsyncToast";
 import { useSystemState } from "@/hooks/useSystem";
+import { BillService } from "@/services/bill.service";
+import { CompleteBillRequest, CreateInitialBillRequest } from "@/types/bill";
 import {
-  BillService,
-  CompleteBillRequest,
-  CreateInitialBillData,
-} from "@/services/bill.service";
+  createCompleteBillFlow,
+  createInitialBillFlow,
+} from "@/utils/operations";
 import { ReactNode, useCallback } from "react";
 
 interface Props {
@@ -19,17 +20,14 @@ export default function OperationsProvider({ children }: Props) {
   const toast = useAsyncToast();
 
   const createInitialBill = useCallback(
-    async (data: CreateInitialBillData) => {
+    async (data: CreateInitialBillRequest) => {
       if (system.status == "loaded") {
-        const promise = BillService.createInitialBill({
-          token: system.token,
-          counter: system.counter,
-          data,
-        });
+        const promise = createInitialBillFlow(system.token, data);
         toast({
           promise: promise,
           loading: "Generating Bill...",
           success: "Bill Printed Successfully",
+          error: (e) => String(e),
         });
         await promise;
         await updateAnalytics();
@@ -58,7 +56,7 @@ export default function OperationsProvider({ children }: Props) {
   const completeBill = useCallback(
     async (data: CompleteBillRequest) => {
       if (system.status == "loaded") {
-        const promise = BillService.completeBill(system.token, data);
+        const promise = createCompleteBillFlow(system.token, data);
         toast({
           promise,
           loading: "Completing bill...",

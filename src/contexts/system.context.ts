@@ -1,8 +1,4 @@
-import {
-  SystemCounter,
-  SystemRegisterData,
-  SystemService,
-} from "@/services/system.service";
+import { Service, SystemCounter, SystemRegisterData } from "@/types/system";
 import { createContext } from "react";
 
 export type SystemState =
@@ -20,7 +16,7 @@ export type SystemState =
       status: "loaded";
       token: string;
       counter: SystemCounter;
-      services: SystemService[];
+      services: Service[];
     };
 
 export type SystemContextType = {

@@ -1,13 +1,13 @@
-import { CompleteBill, CreateInitialBillResponse } from "./bill.service";
+import { CompleteBill } from "@/types/bill";
 import { generateCompleteBill } from "@/utils/generate-complete-bill";
 import { generateInitialBill } from "@/utils/generate-initial-bill";
 
 const PrinterService = {
-  async printBarcode(data: string) {
+  async canPrint() {
     if (window.PrinterBridge) {
-      await window.PrinterBridge.printBarcode(data);
-      await window.PrinterBridge.cutPaper();
+      return Boolean(await window.PrinterBridge.getPrinterStatus());
     }
+    return false;
   },
 
   async printCompleteBill(bill: CompleteBill) {
@@ -18,7 +18,7 @@ const PrinterService = {
     }
   },
 
-  async printInitialBill(bill: CreateInitialBillResponse) {
+  async printInitialBill(bill: CompleteBill) {
     if (window.PrinterBridge) {
       const text = generateInitialBill(bill);
       await window.PrinterBridge.printText(text);

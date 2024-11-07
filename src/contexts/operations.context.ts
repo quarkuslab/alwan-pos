@@ -1,11 +1,9 @@
-import {
-  CompleteBillRequest,
-  CreateInitialBillData,
-} from "@/services/bill.service";
+import {} from "@/services/bill.service";
+import { CompleteBillRequest, CreateInitialBillRequest } from "@/types/bill";
 import { createContext } from "react";
 
 export type OperationsContextType = {
-  createInitialBill: (data: CreateInitialBillData) => Promise<void>;
+  createInitialBill: (data: CreateInitialBillRequest) => Promise<void>;
   completeBill: (data: CompleteBillRequest) => Promise<void>;
   cancelBill: (id: number) => Promise<void>;
 };
