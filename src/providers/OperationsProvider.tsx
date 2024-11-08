@@ -63,9 +63,11 @@ export default function OperationsProvider({ children }: Props) {
           success: "Bill completed successfully",
           error: (e) => String(e),
         });
+        await promise;
+        await updateAnalytics();
       }
     },
-    [system, toast]
+    [system, toast, updateAnalytics]
   );
 
   return (

@@ -118,13 +118,13 @@ export default function FinalBillPage() {
       orderNo: billData.orderNo,
       endTime: time,
     });
-    fetchBillDetails();
+    await fetchBillDetails();
   }, [time, billCalculation, billData, system, completeBill, fetchBillDetails]);
 
   const handleCancelBill = useCallback(async () => {
     if (!billData) return;
     await cancelBill(billData.id);
-    fetchBillDetails();
+    await fetchBillDetails();
   }, [billData, cancelBill, fetchBillDetails]);
 
   const getStatusColor = (status: InitialBill["status"]) => {

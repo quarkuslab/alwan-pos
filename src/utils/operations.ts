@@ -20,4 +20,5 @@ export async function createCompleteBillFlow(
   if (!canPrint) throw new Error("Unable to print");
   const bill = await BillService.completeBill(token, data);
   await PrinterService.printCompleteBill(bill);
+  return bill;
 }
