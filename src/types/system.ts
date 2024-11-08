@@ -17,6 +17,7 @@ export interface Service {
 export interface SystemRegisterData {
   name: string;
   contactInfo: string;
+  password: string;
 }
 
 export interface SystemCounterUpdateData {

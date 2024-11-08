@@ -14,7 +14,7 @@ export const BillService = {
     data: CreateInitialBillRequest
   ): Promise<CompleteBill> {
     const response = await client.post<CreateInitialBillResponse>(
-      "/operations/counter/create-initial-bill",
+      "/counter/create-initial-bill",
       data,
       {
         headers: { "X-Counter-Token": token },
@@ -32,7 +32,7 @@ export const BillService = {
     data: CompleteBillRequest
   ): Promise<CompleteBill> {
     const response = await client.post<{ bill: CompleteBill }>(
-      "/operations/counter/complete-bill",
+      "/counter/complete-bill",
       data,
       {
         headers: { "X-Counter-Token": token },
@@ -56,7 +56,7 @@ export const BillService = {
   ): Promise<PaginatedSearchResponse> {
     try {
       const response = await client.post<PaginatedSearchResponse>(
-        "/operations/counter/search",
+        "/counter/search",
         {
           query,
           page: params.page,
@@ -85,7 +85,7 @@ export const BillService = {
   async getBillData(token: string, orderNo: string): Promise<SearchResultBill> {
     try {
       const response = await client.get<{ bill: SearchResultBill }>(
-        `/operations/counter/bill-data/${orderNo}`,
+        `/counter/bill-data/${orderNo}`,
         {
           headers: { "X-Counter-Token": token },
         }
@@ -113,7 +113,7 @@ export const BillService = {
   async cancelBill(token: string, billId: number): Promise<void> {
     try {
       await client.post(
-        "/operations/counter/cancel-bill",
+        "/counter/cancel-bill",
         { billId },
         {
           headers: { "X-Counter-Token": token },
@@ -130,7 +130,7 @@ export const BillService = {
   async failBill(token: string, billId: number): Promise<void> {
     try {
       await client.post(
-        "/operations/counter/fail-bill",
+        "/counter/fail-bill",
         { billId },
         {
           headers: { "X-Counter-Token": token },

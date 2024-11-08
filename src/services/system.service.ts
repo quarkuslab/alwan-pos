@@ -11,7 +11,7 @@ import {
 export const SystemService = {
   async getDetails(token: string): Promise<SystemCounter> {
     const res = await client.get<{ counter: SystemCounter }>(
-      "/operations/counter/current",
+      "/counter/current",
       {
         headers: {
           "X-Counter-Token": token,
@@ -23,7 +23,7 @@ export const SystemService = {
 
   async register(data: SystemRegisterData): Promise<RegisterResponse> {
     const res = await client.post<RegisterResponse>(
-      "/operations/counter/register",
+      "/auth/register-counter",
       data
     );
     return {
@@ -33,14 +33,11 @@ export const SystemService = {
   },
 
   async getServices(token: string): Promise<Service[]> {
-    const res = await client.get<{ services: Service[] }>(
-      "/operations/counter/services",
-      {
-        headers: {
-          "X-Counter-Token": token,
-        },
-      }
-    );
+    const res = await client.get<{ services: Service[] }>("/counter/services", {
+      headers: {
+        "X-Counter-Token": token,
+      },
+    });
     return res.data.services;
   },
 
@@ -49,7 +46,7 @@ export const SystemService = {
     data: SystemCounterUpdateData
   ): Promise<SystemCounter> {
     const res = await client.post<{ counter: SystemCounter }>(
-      "/operations/counter/update",
+      "/counter/update",
       data,
       {
         headers: {
@@ -61,14 +58,11 @@ export const SystemService = {
   },
 
   async getAnalytics(token: string): Promise<BillCounts> {
-    const res = await client.get<{ counts: BillCounts }>(
-      "/operations/counter/analytics",
-      {
-        headers: {
-          "X-Counter-Token": token,
-        },
-      }
-    );
+    const res = await client.get<{ counts: BillCounts }>("/counter/analytics", {
+      headers: {
+        "X-Counter-Token": token,
+      },
+    });
     return res.data.counts;
   },
 };

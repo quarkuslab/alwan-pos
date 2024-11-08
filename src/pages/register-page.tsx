@@ -23,10 +23,12 @@ import Spinner from "@/components/ui/spinner";
 import { useNavigate } from "react-router";
 import { useSystemRegister } from "@/hooks/useSystem";
 import { useToast } from "@/hooks/use-toast";
+import { isAxiosError } from "axios";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Required" }),
   contactInfo: z.string().min(1, { message: "Required" }),
+  password: z.string().min(1, { message: "Required" }),
 });
 
 export default function RegisterPage() {
@@ -39,6 +41,7 @@ export default function RegisterPage() {
     defaultValues: {
       name: "",
       contactInfo: "",
+      password: "",
     },
   });
 
@@ -48,9 +51,21 @@ export default function RegisterPage() {
       await register({
         name: values.name,
         contactInfo: values.contactInfo,
+        password: values.password,
       });
       navigate("/app", { replace: true });
     } catch (e) {
+      if (isAxiosError(e)) {
+        if (e.response?.status == 403) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Incorrect password",
+          });
+          setLoading(false);
+          return;
+        }
+      }
       toast({
         variant: "destructive",
         title: "Error",
@@ -103,6 +118,27 @@ export default function RegisterPage() {
                     )}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Admin</CardTitle>
+                <CardDescription>Credentials for security</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-10">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Admin Password</FormLabel>
+                      <FormControl>
+                        <FormInput {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
