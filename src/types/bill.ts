@@ -1,6 +1,6 @@
 import { SystemCounter, Service } from "./system";
 
-export type BillStatus = "paid" | "cancelled" | "completed";
+export type BillStatus = "pending" | "cancelled" | "completed";
 export type PaymentMethod = "cash" | "card";
 
 export interface InitialBillBase {

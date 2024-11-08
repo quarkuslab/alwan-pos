@@ -129,12 +129,12 @@ export default function FinalBillPage() {
 
   const getStatusColor = (status: InitialBill["status"]) => {
     switch (status) {
-      case "paid":
-        return "bg-green-500";
+      case "pending":
+        return "bg-yellow-500";
       case "cancelled":
         return "bg-red-500";
       case "completed":
-        return "bg-blue-500";
+        return "bg-green-500";
       default:
         return "bg-gray-500";
     }
@@ -328,7 +328,7 @@ export default function FinalBillPage() {
             </div>
           </div>
         </CardContent>
-        {billData.status == "paid" ? (
+        {billData.status == "pending" ? (
           <CardFooter className="flex justify-end">
             {billCalculation.billableHours > 0 ? (
               <Button onClick={handleCompleteBill}>Complete Bill</Button>
