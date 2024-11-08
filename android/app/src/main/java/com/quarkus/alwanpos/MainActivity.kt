@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                     bitmap = preprocessBitmap(bitmap)
 
                     // Scale the bitmap
-                    val scaledBitmap = scaleBitmap(bitmap, 384)
+                    val scaledBitmap = scaleBitmap(bitmap, 192)
 
                     printerService?.apply {
                         setAlignment(1, null)

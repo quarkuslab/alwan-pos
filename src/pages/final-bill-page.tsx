@@ -4,7 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
-  // CardFooter,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,7 +19,7 @@ import { useSystemState } from "@/hooks/useSystem";
 import { isAxiosError } from "axios";
 import { formatAmount } from "@/utils/amount";
 import {
-  // useCancelBillOperation,
+  useCancelBillOperation,
   useCompleteBillOperation,
 } from "@/hooks/useOperations";
 import useTime from "@/hooks/useTime";
@@ -33,7 +33,7 @@ interface PageError {
 export default function FinalBillPage() {
   const time = useTime();
   const system = useSystemState();
-  // const cancelBill = useCancelBillOperation();
+  const cancelBill = useCancelBillOperation();
   const completeBill = useCompleteBillOperation();
   const [orderNo, setOrderNo] = useQueryState("orderNo", { defaultValue: "" });
   const [manualOrderNo, setManualOrderNo] = useState("");
@@ -112,18 +112,20 @@ export default function FinalBillPage() {
 
   const handleCompleteBill = useCallback(async () => {
     if (!billData || !billCalculation || system.status !== "loaded") return;
-    completeBill({
+    await completeBill({
       balanceAmount: billCalculation.balanceAmount,
       billedHours: billCalculation.billableHours,
       orderNo: billData.orderNo,
       endTime: time,
     });
-  }, [time, billCalculation, billData, system, completeBill]);
+    fetchBillDetails();
+  }, [time, billCalculation, billData, system, completeBill, fetchBillDetails]);
 
-  // const handleCancelBill = useCallback(() => {
-  //   if (!billData) return;
-  //   cancelBill(billData.id);
-  // }, [billData, cancelBill]);
+  const handleCancelBill = useCallback(async () => {
+    if (!billData) return;
+    await cancelBill(billData.id);
+    fetchBillDetails();
+  }, [billData, cancelBill, fetchBillDetails]);
 
   const getStatusColor = (status: InitialBill["status"]) => {
     switch (status) {
@@ -326,8 +328,7 @@ export default function FinalBillPage() {
             </div>
           </div>
         </CardContent>
-        <Button onClick={handleCompleteBill}>Complete Bill</Button>
-        {/* {billData.status == "paid" ? (
+        {billData.status == "paid" ? (
           <CardFooter className="flex justify-end">
             {billCalculation.billableHours > 0 ? (
               <Button onClick={handleCompleteBill}>Complete Bill</Button>
@@ -337,7 +338,7 @@ export default function FinalBillPage() {
               </Button>
             )}
           </CardFooter>
-        ) : null} */}
+        ) : null}
       </Card>
     </div>
   );
