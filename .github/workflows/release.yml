@@ -29,6 +29,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+          cache: "gradle" # Enable Gradle caching
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -42,13 +43,16 @@ jobs:
           node-version: 20
           cache: "pnpm"
 
-      # Install dependencies without frozen lockfile for first run
       - name: Install dependencies
         run: pnpm install
 
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+
       - name: Create keystore directory
-        run: |
-          mkdir -p android/app/keystore
+        run: mkdir -p android/app/keystore
 
       - name: Decode Keystore
         run: |
@@ -74,14 +78,34 @@ jobs:
         run: |
           cp -r dist/* android/app/src/main/assets/www/
 
-      - name: Build Release APK
-        run: cd android && ./gradlew assembleRelease
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
 
-      - name: Rename APK with version
+      - name: Build Release APK
+        run: |
+          cd android
+          ./gradlew assembleRelease --stacktrace || {
+            echo "Gradle build failed. Checking for logs..."
+            find . -name "*.log" -type f -exec echo "=== {} ===" \; -exec cat {} \;
+            exit 1
+          }
+
+      - name: Verify APK
+        run: |
+          if [ ! -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+            echo "APK file not found!"
+            exit 1
+          fi
+          echo "APK size: $(ls -lh android/app/build/outputs/apk/release/app-release.apk)"
+
+      - name: Prepare Release Directory
+        run: mkdir -p releases
+
+      - name: Rename and Copy APK
         run: |
           VERSION=${{ github.ref_name }}
-          mkdir -p releases
           cp android/app/build/outputs/apk/release/app-release.apk "releases/alwan-pos-${VERSION}.apk"
+          echo "Created release APK: alwan-pos-${VERSION}.apk"
 
       - name: Generate release notes
         id: release_notes
@@ -101,7 +125,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Optional: Upload the lockfile as an artifact if it was generated
       - name: Upload pnpm-lock.yaml
         if: success() && !hashFiles('pnpm-lock.yaml')
         uses: actions/upload-artifact@v3
