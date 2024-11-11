@@ -9,6 +9,7 @@ export interface Service {
   title: string;
   calculationMethod: "usage" | "balance";
   advanceAmount: number;
+  fulldayAdvanceAmount: number;
   pricePerHour: number;
   hasFulldayCalculation: boolean;
   description?: string;

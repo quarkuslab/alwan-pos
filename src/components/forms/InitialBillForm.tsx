@@ -32,6 +32,7 @@ import {
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -76,12 +77,23 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
     },
   });
 
+  const isFullDay = form.watch("fullDay");
+
   const total = useMemo(
-    () => quantity * props.service.advanceAmount,
-    [quantity, props.service]
+    () =>
+      quantity *
+      (isFullDay
+        ? props.service.fulldayAdvanceAmount
+        : props.service.advanceAmount),
+    [quantity, isFullDay, props.service]
   );
 
-  // Use custom amount if it exists, otherwise use calculated total
+  // Reset custom amount when fullDay changes
+  useEffect(() => {
+    setCustomAmount(null);
+    setIsEditingAmount(false);
+  }, [isFullDay, props.service]);
+
   const displayedAmount = customAmount !== null ? customAmount : total;
 
   const resetForm = useCallback(() => {
@@ -103,14 +115,12 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
 
   const handleDecrement = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
-    // Reset custom amount when quantity changes
     setCustomAmount(null);
     setIsEditingAmount(false);
   };
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
-    // Reset custom amount when quantity changes
     setCustomAmount(null);
     setIsEditingAmount(false);
   };
@@ -122,11 +132,9 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
 
   const toggleEditAmount = () => {
     if (isEditingAmount) {
-      // When finishing edit, keep the custom amount
       setIsEditingAmount(false);
     } else {
       setIsEditingAmount(true);
-      // Start with current displayed amount (either custom or calculated)
       setCustomAmount(displayedAmount);
     }
   };
