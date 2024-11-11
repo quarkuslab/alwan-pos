@@ -72,6 +72,8 @@ jobs:
 
       - name: Build Web Assets
         run: pnpm run web:build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Prepare Android Assets Directory
         run: |
