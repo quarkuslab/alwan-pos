@@ -26,6 +26,8 @@ import {
   Sun,
   Minus,
   Plus,
+  Pencil,
+  Check,
 } from "lucide-react";
 import {
   forwardRef,
@@ -60,6 +62,8 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
   const time = useTime();
   const toggleGroupRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
+  const [isEditingAmount, setIsEditingAmount] = useState(false);
+  const [customAmount, setCustomAmount] = useState<number | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,10 +81,14 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
     [quantity, props.service]
   );
 
+  // Use custom amount if it exists, otherwise use calculated total
+  const displayedAmount = customAmount !== null ? customAmount : total;
+
   const resetForm = useCallback(() => {
     form.reset();
     setQuantity(1);
-    // Force reset the toggle group items' data-state
+    setCustomAmount(null);
+    setIsEditingAmount(false);
     if (toggleGroupRef.current) {
       const items = toggleGroupRef.current.querySelectorAll("[data-state]");
       items.forEach((item) => {
@@ -95,10 +103,32 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
 
   const handleDecrement = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
+    // Reset custom amount when quantity changes
+    setCustomAmount(null);
+    setIsEditingAmount(false);
   };
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
+    // Reset custom amount when quantity changes
+    setCustomAmount(null);
+    setIsEditingAmount(false);
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setCustomAmount(isNaN(value) ? 0 : value);
+  };
+
+  const toggleEditAmount = () => {
+    if (isEditingAmount) {
+      // When finishing edit, keep the custom amount
+      setIsEditingAmount(false);
+    } else {
+      setIsEditingAmount(true);
+      // Start with current displayed amount (either custom or calculated)
+      setCustomAmount(displayedAmount);
+    }
   };
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
@@ -110,7 +140,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
       remarks: values.remarks,
       paymentMethod: values.payment,
       isFullday: values.fullDay,
-      paidAmount: total,
+      paidAmount: displayedAmount,
       serviceId: props.service.id,
     });
   }
@@ -121,7 +151,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
         className="w-full max-w-3xl space-y-5"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
-        {/* First row with name and phone remains the same */}
+        {/* Previous form fields remain the same */}
         <div className="grid grid-cols-7 gap-5">
           <div className="col-span-4">
             <FormField
@@ -153,11 +183,9 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
           </div>
         </div>
 
-        {/* Updated grid section */}
         <div className="grid grid-cols-7 gap-5">
           <div className="col-span-4">
             <div className="grid grid-cols-2 gap-5">
-              {/* Payment Section */}
               <FormField
                 control={form.control}
                 name="payment"
@@ -186,7 +214,6 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
                 )}
               />
 
-              {/* Quantity Section */}
               <div className="space-y-2">
                 <FormLabel>Quantity</FormLabel>
                 <div className="flex items-center space-x-2 h-11">
@@ -214,7 +241,6 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
                 </div>
               </div>
 
-              {/* Full Day Section */}
               {props.service.hasFulldayCalculation && (
                 <FormField
                   control={form.control}
@@ -237,7 +263,6 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
                 />
               )}
 
-              {/* Time Section */}
               <div className="space-y-2">
                 <FormLabel>Time</FormLabel>
                 <div className="flex items-center justify-center space-x-3 h-11 bg-white px-5 border border-primary-950 rounded-md">
@@ -248,7 +273,6 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
             </div>
           </div>
 
-          {/* Updated Remarks Section with full height */}
           <div className="col-span-3">
             <FormField
               control={form.control}
@@ -271,11 +295,44 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
           </div>
         </div>
 
-        {/* Rest of the form remains the same */}
         <div className="bg-white border border-primary-950 rounded-md flex items-center justify-between p-10">
           <div className="text-2xl font-bold">AMOUNT TO BE PAID:</div>
-          <div className="text-4xl font-bold">{formatAmount(total)}</div>
+          <div className="flex items-center space-x-4">
+            {isEditingAmount ? (
+              <div className="flex items-center space-x-2">
+                <FormInput
+                  type="number"
+                  value={customAmount ?? total}
+                  onChange={handleAmountChange}
+                  className="w-40 text-4xl font-bold text-right"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleEditAmount}
+                >
+                  <Check className="h-6 w-6" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="text-4xl font-bold">
+                  {formatAmount(displayedAmount)}
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleEditAmount}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
+
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="text-lg font-medium">PRICE PER HOUR:</div>
