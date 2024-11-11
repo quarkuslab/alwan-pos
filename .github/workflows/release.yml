@@ -89,7 +89,7 @@ jobs:
       - name: Build Release and Debug APK
         run: |
           cd android
-          ./gradlew assembleRelease assembleDebug --stacktrace || {
+          ./gradlew assembleRelease --stacktrace || {
             echo "Gradle build failed. Checking for logs..."
             find . -name "*.log" -type f -exec echo "=== {} ===" \; -exec cat {} \;
             exit 1
@@ -101,12 +101,7 @@ jobs:
             echo "Release APK file not found!"
             exit 1
           fi
-          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "Debug APK file not found!"
-            exit 1
-          fi
           echo "Release APK size: $(ls -lh android/app/build/outputs/apk/release/app-release.apk)"
-          echo "Debug APK size: $(ls -lh android/app/build/outputs/apk/debug/app-debug.apk)"
 
       - name: Prepare Release Directory
         run: mkdir -p releases
@@ -115,9 +110,7 @@ jobs:
         run: |
           VERSION=${{ github.ref_name }}
           cp android/app/build/outputs/apk/release/app-release.apk "releases/alwan-pos-${VERSION}.apk"
-          cp android/app/build/outputs/apk/debug/app-debug.apk "releases/alwan-pos-${VERSION}-debug.apk"
           echo "Created release APK: alwan-pos-${VERSION}.apk"
-          echo "Created debug APK: alwan-pos-${VERSION}-debug.apk"
 
       - name: Generate release notes
         id: release_notes
