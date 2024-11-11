@@ -1,10 +1,16 @@
-import { User, Phone, CreditCard, Clock } from "lucide-react";
+import { User, Phone, CreditCard, Clock, Copy } from "lucide-react";
 import { displayTime } from "@/utils/time";
 import { Card, CardContent } from "../ui/card";
 import HighlightText from "../ui/highlight";
 import { Button } from "../ui/button";
 import { SearchResultBill } from "@/types/bill";
 import { useSystemState } from "@/hooks/useSystem";
+import { useMemo, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Props {
   searchQuery: string;
@@ -18,6 +24,42 @@ export default function SearchResultCard({
   onCancel,
 }: Props) {
   const system = useSystemState();
+  const [showCopied, setShowCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    try {
+      // Create temporary input
+      const tempInput = document.createElement("input");
+      tempInput.style.position = "fixed";
+      tempInput.style.opacity = "0";
+      tempInput.value = bill.orderNo;
+      document.body.appendChild(tempInput);
+
+      // Select the text
+      tempInput.focus();
+      tempInput.select();
+
+      // Copy the text
+      const successful = document.execCommand("copy");
+
+      // Remove the temporary input
+      document.body.removeChild(tempInput);
+
+      if (successful) {
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
+  const canCancel = useMemo(() => {
+    if (system.status != "loaded") return false;
+    if (bill.counterId != system.counter.id) return false;
+    if (Date.now() - bill.startTime.getTime() > 5 * 60 * 1000) return false;
+    return true;
+  }, [system, bill]);
 
   return (
     <Card className="w-full">
@@ -25,7 +67,25 @@ export default function SearchResultCard({
         <div className="flex items-stretch justify-between">
           <div className="flex-1 flex flex-col space-y-3">
             <div className="text-xl">
-              <HighlightText text={"#" + bill.orderNo} query={searchQuery} />
+              <Popover open={showCopied}>
+                <PopoverTrigger asChild>
+                  <button
+                    onClick={copyToClipboard}
+                    className="flex items-center bg-white"
+                  >
+                    <span className="mr-2">
+                      <HighlightText
+                        text={"#" + bill.orderNo}
+                        query={searchQuery}
+                      />
+                    </span>
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="bg-green-500 text-white border-none py-1 px-3 w-auto">
+                  <p className="text-sm font-medium">Copied!</p>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="text-2xl font-medium">{bill.service.title}</div>
             <div className="flex space-x-5">
@@ -58,21 +118,16 @@ export default function SearchResultCard({
                 AED {(bill.paidAmount ?? 0).toFixed(2)}
               </span>
             </div>
-            {system.status == "loaded"
-              ? system.counter.id + "|" + bill.counterId
-              : null}
-            {system.status == "loaded" ? (
-              system.counter.id == bill.counterId ? (
-                <div className="mt-3">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => onCancel && onCancel(bill)}
-                  >
-                    Cancel Bill
-                  </Button>
-                </div>
-              ) : null
+            {canCancel ? (
+              <div className="mt-3">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onCancel && onCancel(bill)}
+                >
+                  Cancel Bill
+                </Button>
+              </div>
             ) : null}
           </div>
         </div>
