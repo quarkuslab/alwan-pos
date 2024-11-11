@@ -3,10 +3,21 @@ name: Android Release Build
 on:
   push:
     tags:
-      - "v*"
+      - "v[0-9]+.[0-9]+.[0-9]+*" # Matches v1.2.3, v1.2.3-beta, etc.
 
 jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate tag format
+        run: |
+          if ! [[ ${{ github.ref_name }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "Invalid tag format. Must be like v1.2.3 or v1.2.3-beta"
+            exit 1
+          fi
+
   build:
+    needs: validate-tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,16 +28,19 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Set up Node.js
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: "18"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: |
-          npm install -g pnpm
-          pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Create keystore directory
         run: |
@@ -46,26 +60,41 @@ jobs:
           EOF
 
       - name: Build Web Assets
-        run: npm run web:build
+        run: pnpm run web:build
 
       - name: Copy Web Assets to Android
-        run: npm run android:copy
+        run: pnpm run android:copy
 
       - name: Build Release APK
         run: cd android && ./gradlew assembleRelease
 
-      - name: Move APK to releases directory
+      - name: Rename APK with version
         run: |
+          VERSION=${{ github.ref_name }}
           mkdir -p releases
-          cp android/app/build/outputs/apk/release/app-release.apk "releases/alwan-pos-$(date +%Y%m%d-%H%M%S).apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "releases/alwan-pos-${VERSION}.apk"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          echo "### Changes in ${{ github.ref_name }}" > release_notes.md
+          echo "" >> release_notes.md
+          git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> release_notes.md
 
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: releases/*.apk
+          body_path: release_notes.md
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, '-') }} # True if tag contains hyphen (e.g., -beta)
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: releases/*.apk
+          retention-days: 7
