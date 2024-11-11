@@ -1,6 +1,49 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+fun getVersionCode(): Int {
+    val tagName = System.getenv("GITHUB_REF_NAME") ?: return 1
+    return when {
+        tagName.startsWith("v") -> {
+            // Remove 'v' prefix and split by dots
+            val parts = tagName.substring(1).split(".")
+            if (parts.size >= 3) {
+                // Convert v1.2.3 to 1002003 (1 million * major + 1000 * minor + patch)
+                val major = parts[0].toIntOrNull() ?: 0
+                val minor = parts[1].toIntOrNull() ?: 0
+                val patch = parts[2].toIntOrNull() ?: 0
+                major * 1_000_000 + minor * 1_000 + patch
+            } else {
+                1
+            }
+        }
+        else -> 1
+    }
+}
+
+fun getVersionName(): String {
+    return System.getenv("GITHUB_REF_NAME")?.let { tag ->
+        if (tag.startsWith("v")) tag.substring(1) else tag
+    } ?: "0.1.0"
+}
+
+fun getKeystoreProperties(): Properties {
+    val properties = Properties()
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        properties.load(FileInputStream(keystorePropertiesFile))
+    } else {
+        properties.setProperty("storePassword", System.getenv("KEYSTORE_STORE_PASSWORD") ?: "")
+        properties.setProperty("keyPassword", System.getenv("KEYSTORE_KEY_PASSWORD") ?: "")
+        properties.setProperty("keyAlias", System.getenv("KEYSTORE_KEY_ALIAS") ?: "")
+        properties.setProperty("storeFile", System.getenv("KEYSTORE_FILE") ?: "")
+    }
+    return properties
 }
 
 android {
@@ -15,8 +58,10 @@ android {
         applicationId = "com.quarkus.alwanpos"
         minSdk = 25
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+
+        // Dynamic version code and name
+        versionCode = getVersionCode()
+        versionName = getVersionName()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,32 +69,50 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val props = getKeystoreProperties()
+            if (props.getProperty("storeFile")?.isNotEmpty() == true) {
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
-            // Define the WebView URL based on the buildEnvironment parameter
             applicationIdSuffix = ".debug"
         }
         release {
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
