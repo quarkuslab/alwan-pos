@@ -168,6 +168,12 @@ export default function FinalBillPage() {
     await fetchBillDetails();
   }, [billData, cancelBill, fetchBillDetails]);
 
+  const canAddDiscount = useMemo(() => {
+    if (system.status != "loaded") return false;
+    if (billCalculation?.isCancellable) return false;
+    return true;
+  }, [system, billCalculation]);
+
   const getStatusColor = (status: InitialBill["status"]) => {
     switch (status) {
       case "pending":
@@ -406,40 +412,44 @@ export default function FinalBillPage() {
         {billData.status === "pending" && (
           <CardFooter className="flex justify-between">
             <div className="flex items-center gap-4">
-              {showDiscountInput ? (
-                <div className="flex items-center space-x-2">
-                  <Input
-                    type="number"
-                    value={discountAmount}
-                    onChange={(e) => setDiscountAmount(Number(e.target.value))}
-                    placeholder="Enter discount amount"
-                    className="w-40"
-                  />
+              {canAddDiscount ? (
+                showDiscountInput ? (
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="number"
+                      value={discountAmount}
+                      onChange={(e) =>
+                        setDiscountAmount(Number(e.target.value))
+                      }
+                      placeholder="Enter discount amount"
+                      className="w-40"
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleDiscountSave}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleDiscountCancel}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
                   <Button
+                    variant="outline"
                     size="sm"
-                    variant="ghost"
-                    onClick={handleDiscountSave}
+                    onClick={() => setShowDiscountInput(true)}
                   >
-                    <Check className="h-4 w-4" />
+                    <Gift className="h-4 w-4 mr-2" />
+                    Add Discount
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleDiscountCancel}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDiscountInput(true)}
-                >
-                  <Gift className="h-4 w-4 mr-2" />
-                  Add Discount
-                </Button>
-              )}
+                )
+              ) : null}
             </div>
             <div>
               {billCalculation.isCancellable ? (

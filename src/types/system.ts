@@ -31,7 +31,7 @@ export interface RegisterResponse {
 }
 
 export interface BillCounts {
-  paidCount: number;
+  pendingCount: number;
   cancelledCount: number;
   completedCount: number;
 }

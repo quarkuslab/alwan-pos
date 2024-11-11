@@ -2,7 +2,7 @@ import { BillCounts } from "@/types/system";
 import { createContext } from "react";
 
 export const initialBillCounts: BillCounts = {
-  paidCount: 0,
+  pendingCount: 0,
   cancelledCount: 0,
   completedCount: 0,
 };

@@ -25,7 +25,7 @@ export default function HomePage() {
   const total = useMemo(() => {
     if (analytics.status == "loaded") {
       return (
-        analytics.counts.paidCount +
+        analytics.counts.pendingCount +
         analytics.counts.cancelledCount +
         analytics.counts.completedCount
       );
@@ -36,9 +36,9 @@ export default function HomePage() {
   const statusData = useMemo(
     () => [
       {
-        name: "Active",
-        value: analytics.status == "loaded" ? analytics.counts.paidCount : 0,
-        color: "#0ea5e9",
+        name: "Pending",
+        value: analytics.status == "loaded" ? analytics.counts.pendingCount : 0,
+        color: "#f59e0b",
         description: "Services currently with customers",
       },
       {
@@ -92,18 +92,18 @@ export default function HomePage() {
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-3">
           {/* Current Rentals Card */}
-          <Card className="bg-blue-50">
+          <Card className="bg-amber-50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Active Services
+                Pending Services
               </CardTitle>
-              <Timer className="h-4 w-4 text-blue-500" />
+              <Timer className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-700">
-                {analytics.counts.paidCount}
+              <div className="text-2xl font-bold text-amber-700">
+                {analytics.counts.pendingCount}
               </div>
-              <p className="text-xs text-blue-600">
+              <p className="text-xs text-amber-600">
                 Services currently with customers
               </p>
             </CardContent>
