@@ -20,46 +20,31 @@ jobs:
     needs: validate-tag
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history for proper versioning
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
+          run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
-
-      # Convert package-lock.json or yarn.lock if they exist
-      - name: Convert existing lockfile
-        run: |
-          if [ -f "package-lock.json" ]; then
-            echo "Converting package-lock.json to pnpm-lock.yaml"
-            pnpm import
-          elif [ -f "yarn.lock" ]; then
-            echo "Converting yarn.lock to pnpm-lock.yaml"
-            pnpm import
-          fi
-        continue-on-error: true
+          node-version: 20
+          cache: "pnpm"
 
       # Install dependencies without frozen lockfile for first run
       - name: Install dependencies
-        run: |
-          if [ -f "pnpm-lock.yaml" ]; then
-            pnpm install --frozen-lockfile
-          else
-            pnpm install
-          fi
+        run: pnpm install
 
       - name: Create keystore directory
         run: |
