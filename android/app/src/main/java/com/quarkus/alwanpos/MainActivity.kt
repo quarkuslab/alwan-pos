@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -25,17 +26,25 @@ import java.io.IOException
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private var printerService: SunmiPrinterService? = null
-
-    // Add these variables for back button handling
     private var doubleBackToExitPressedOnce = false
     private val handler = Handler(Looper.getMainLooper())
-    private val doublePressDelay = 2000L // 2 seconds window for second press
+    private val doublePressDelay = 2000L
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            Log.e("MainActivity", "Uncaught exception", throwable)
+            // Log to file or crash reporting service
+        }
+
         super.onCreate(savedInstanceState)
-        initWebView()
-        initPrinter()
+        try {
+            initWebView()
+            initPrinter()
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error in onCreate", e)
+            Toast.makeText(this, "Error initializing app: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -68,31 +77,60 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("SetJavaScriptEnabled", "NewApi")
     private fun initWebView() {
-        val context = this
-        val assetLoader = WebViewAssetLoader.Builder()
-            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
-            .build()
+        try {
+            val context = this
+            val assetLoader = WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+                .build()
 
-        webView = WebView(this).apply {
-            settings.apply {
-                javaScriptEnabled = true
-                domStorageEnabled = true
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-            }
-            webViewClient = object : WebViewClient() {
-                override fun shouldInterceptRequest(
-                    view: WebView,
-                    request: WebResourceRequest
-                ): WebResourceResponse? {
-                    return assetLoader.shouldInterceptRequest(request.url)
+            webView = WebView(this).apply {
+                settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    allowFileAccess = true
+                    allowContentAccess = true
+                    databaseEnabled = true
+                    mediaPlaybackRequiresUserGesture = false
+                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 }
+
+                webViewClient = object : WebViewClient() {
+                    override fun shouldInterceptRequest(
+                        view: WebView,
+                        request: WebResourceRequest
+                    ): WebResourceResponse? {
+                        return try {
+                            assetLoader.shouldInterceptRequest(request.url)
+                        } catch (e: Exception) {
+                            Log.e("WebView", "Error intercepting request", e)
+                            null
+                        }
+                    }
+
+                    @Deprecated("Deprecated in Java")
+                    override fun onReceivedError(
+                        view: WebView?,
+                        errorCode: Int,
+                        description: String?,
+                        failingUrl: String?
+                    ) {
+                        Log.e("WebView", "Error loading URL: $failingUrl, Error: $description")
+                        super.onReceivedError(view, errorCode, description, failingUrl)
+                    }
+                }
+
+                // Add JavaScript interfaces
+                addJavascriptInterface(PrinterBridge(), "PrinterBridge")
+                addJavascriptInterface(SettingsBridge(context), "SettingsBridge")
+
+                // Load the URL
+                loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
             }
-            addJavascriptInterface(PrinterBridge(), "PrinterBridge")
-            addJavascriptInterface(SettingsBridge(context), "SettingsBridge")
-            loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
+            setContentView(webView)
+        } catch (e: Exception) {
+            Log.e("WebView", "Error initializing WebView", e)
+            throw e
         }
-        setContentView(webView)
     }
 
     private fun initPrinter() {

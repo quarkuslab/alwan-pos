@@ -6,14 +6,13 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+// Keep your existing version functions
 fun getVersionCode(): Int {
     val tagName = System.getenv("GITHUB_REF_NAME") ?: return 1
     return when {
         tagName.startsWith("v") -> {
-            // Remove 'v' prefix and split by dots
             val parts = tagName.substring(1).split(".")
             if (parts.size >= 3) {
-                // Convert v1.2.3 to 1002003 (1 million * major + 1000 * minor + patch)
                 val major = parts[0].toIntOrNull() ?: 0
                 val minor = parts[1].toIntOrNull() ?: 0
                 val patch = parts[2].toIntOrNull() ?: 0
@@ -58,8 +57,6 @@ android {
         applicationId = "com.quarkus.alwanpos"
         minSdk = 25
         targetSdk = 34
-
-        // Dynamic version code and name
         versionCode = getVersionCode()
         versionName = getVersionName()
 
@@ -84,6 +81,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            isDebuggable = true
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -93,6 +91,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Ensure WebView can load assets in release build
+            manifestPlaceholders["webViewAssetLoader"] = true
         }
     }
 
@@ -115,16 +115,25 @@ android {
 
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += listOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module"
+            )
         }
     }
 }
 
 dependencies {
-    // Add Sunmi printer
+    // Keep your existing dependencies
     implementation("com.sunmi:printerlibrary:1.0.15")
-
-    // Webkit
     implementation("androidx.webkit:webkit:1.8.0")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.4.1")
