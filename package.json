@@ -12,6 +12,8 @@
     "android:copy": "rmdir-cli android/app/src/main/assets/www && cpx dist/**/* android/app/src/main/assets/www",
     "android:build": "cd android && gradlew assembleDebug",
     "android:launch": "cd android && gradlew installDebug && adb shell am start -n com.quarkus.alwanpos.debug/com.quarkus.alwanpos.MainActivity",
+    "android:release": "cd android && gradlew assembleRelease && cd .. && mkdir -p releases && cp android/app/build/outputs/apk/release/app-release.apk releases/alwan-pos.apk",
+    "build:apk": "npm run web:build && npm run android:copy && npm run android:release",
     "lint": "eslint .",
     "preview": "vite preview"
   },

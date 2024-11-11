@@ -1,0 +1,71 @@
+name: Android Release Build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Create keystore directory
+        run: |
+          mkdir -p android/app/keystore
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore/release.keystore
+
+      - name: Create keystore.properties
+        run: |
+          cat << EOF > android/keystore.properties
+          storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
+          storeFile=keystore/release.keystore
+          EOF
+
+      - name: Build Web Assets
+        run: npm run web:build
+
+      - name: Copy Web Assets to Android
+        run: npm run android:copy
+
+      - name: Build Release APK
+        run: cd android && ./gradlew assembleRelease
+
+      - name: Move APK to releases directory
+        run: |
+          mkdir -p releases
+          cp android/app/build/outputs/apk/release/app-release.apk "releases/alwan-pos-$(date +%Y%m%d-%H%M%S).apk"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: releases/*.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
