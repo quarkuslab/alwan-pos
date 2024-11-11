@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently -n \"WEB,ANDROID\" -c \"blue,green\" \"npm run web:dev\" \"npm run android:dev\"",
     "web:dev": "dotenv -- vite",
-    "android:dev": "nodemon --watch android --watch src --ignore android/app/src/main/assets/www --ignore android/app/build --ignore android/.gradle --ignore android/.idea --ext ts,tsx,css,html,java,kt,xml,gradle --exec \"npm run web:build && npm run android:copy && npm run android:build && npm run android:launch\"",
+    "android:dev": "nodemon --watch android --watch src --ignore android/app/src/main/assets/www --ignore android/app/build --ignore android/.gradle --ignore android/.idea --ignore android/app/src/main/assets/www --ext ts,tsx,css,html,java,kt,xml,gradle --exec \"npm run web:build && npm run android:copy && npm run android:build && npm run android:launch\"",
     "build": "npm run web:build && npm run android:copy && npm run android:build",
     "web:build": "dotenv -- tsc -b && vite build",
     "android:copy": "rmdir-cli android/app/src/main/assets/www && cpx dist/**/* android/app/src/main/assets/www",
