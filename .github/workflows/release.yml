@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for proper versioning
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -37,10 +39,27 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
-          cache: "pnpm"
 
+      # Convert package-lock.json or yarn.lock if they exist
+      - name: Convert existing lockfile
+        run: |
+          if [ -f "package-lock.json" ]; then
+            echo "Converting package-lock.json to pnpm-lock.yaml"
+            pnpm import
+          elif [ -f "yarn.lock" ]; then
+            echo "Converting yarn.lock to pnpm-lock.yaml"
+            pnpm import
+          fi
+        continue-on-error: true
+
+      # Install dependencies without frozen lockfile for first run
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          if [ -f "pnpm-lock.yaml" ]; then
+            pnpm install --frozen-lockfile
+          else
+            pnpm install
+          fi
 
       - name: Create keystore directory
         run: |
@@ -87,10 +106,19 @@ jobs:
           files: releases/*.apk
           body_path: release_notes.md
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }} # True if tag contains hyphen (e.g., -beta)
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Optional: Upload the lockfile as an artifact if it was generated
+      - name: Upload pnpm-lock.yaml
+        if: success() && !hashFiles('pnpm-lock.yaml')
+        uses: actions/upload-artifact@v3
+        with:
+          name: pnpm-lock
+          path: pnpm-lock.yaml
+          retention-days: 7
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
