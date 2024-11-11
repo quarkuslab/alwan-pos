@@ -6,7 +6,7 @@
 # Keep SettingsBridge class if it exists
 -keep class com.quarkus.alwanpos.SettingsBridge { *; }
 
-# Keep WebView and JavaScript interfaces
+# WebView and JavaScript interfaces
 -keepattributes JavascriptInterface
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
@@ -16,65 +16,58 @@
 -keep class android.webkit.** { *; }
 -keep class androidx.webkit.** { *; }
 
-# Keep Sunmi Printer related classes
+# Sunmi Printer Service - Critical for printer functionality
+-keep class android.os.SystemProperties { *; }
 -keep class com.sunmi.peripheral.printer.** { *; }
+-keep interface com.sunmi.peripheral.printer.** { *; }
+
+# Keep AIDL related classes
 -keep class woyou.aidlservice.jiuiv5.** { *; }
--keep class com.sunmi.** { *; }
+-keep interface woyou.aidlservice.jiuiv5.** { *; }
 
-# Keep Android core components
--keep class androidx.core.** { *; }
--keep class androidx.appcompat.** { *; }
+# Keep IBinder and IInterface for AIDL
+-keep class android.os.IBinder { *; }
+-keep class android.os.IInterface { *; }
+-keep class android.os.Parcel { *; }
 
-# Keep needed Android components
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.preference.Preference
--keep public class * extends android.view.View
-
-# Keep all public constructors of all public classes
--keepclassmembers public class * {
-    public <init>(...);
+# Keep Parcelable
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
 }
 
-# Keep native methods
--keepclasseswithmembernames class * {
+# Keep AIDL generated classes
+-keep class * extends android.os.IInterface { *; }
+-keep class * extends android.os.Binder { *; }
+
+# Keep printer callbacks
+-keep class com.sunmi.peripheral.printer.InnerPrinterCallback { *; }
+-keep class com.sunmi.peripheral.printer.InnerResultCallback { *; }
+-keep class com.sunmi.peripheral.printer.TransBean { *; }
+
+# Keep essential Android components
+-keep class android.content.** { *; }
+-keep class android.app.** { *; }
+
+# Keep all native methods
+-keepclasseswithmembers class * {
     native <methods>;
 }
 
-# Keep Parcelables
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
-}
-
-# Keep Serializable classes
--keepnames class * implements java.io.Serializable
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    !static !transient <fields>;
-    !private <fields>;
-    !private <methods>;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
-# Keep source file names for better crash reports
--keepattributes SourceFile,LineNumberTable
--renamesourcefileattribute SourceFile
-
-# Keep Component names for better crash reports
+# Keep Component names and Exceptions for better debugging
 -keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keepattributes Signature
+-keepattributes Exceptions
+-keepattributes InnerClasses
 
-# Keep Exceptions
--keep public class * extends java.lang.Exception
-
-# Keep Enum classes
--keepclassmembers,allowoptimization enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
+# Keep R files
+-keepclassmembers class **.R$* {
+    public static <fields>;
 }
+
+# Keep BuildConfig
+-keep class com.quarkus.alwanpos.BuildConfig { *; }
+
+# Keep essential printer classes from being renamed
+-keepnames class com.sunmi.peripheral.printer.SunmiPrinterService { *; }
+-keepnames class com.sunmi.peripheral.printer.InnerPrinterManager { *; }

@@ -21,7 +21,6 @@ import androidx.webkit.WebViewAssetLoader
 import com.sunmi.peripheral.printer.InnerPrinterCallback
 import com.sunmi.peripheral.printer.InnerPrinterManager
 import com.sunmi.peripheral.printer.SunmiPrinterService
-import java.io.IOException
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
