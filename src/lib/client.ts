@@ -1,7 +1,8 @@
+import Env from "@/env";
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: "http://192.168.0.81:8000",
+  baseURL: Env.apiUrl,
 });
 
 export default client;
