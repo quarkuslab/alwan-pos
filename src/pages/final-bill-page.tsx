@@ -12,7 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Clock, ArrowRight, RefreshCcw } from "lucide-react";
+import {
+  Loader2,
+  Clock,
+  ArrowRight,
+  RefreshCcw,
+  Gift,
+  X,
+  Check,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { BillService } from "@/services/bill.service";
 import { useSystemState } from "@/hooks/useSystem";
@@ -40,6 +48,8 @@ export default function FinalBillPage() {
   const [billData, setBillData] = useState<SearchResultBill | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<PageError | null>(null);
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   const billCalculation = useMemo(() => {
     if (!billData) return null;
@@ -47,18 +57,14 @@ export default function FinalBillPage() {
     const durationMs = time.getTime() - startTime.getTime();
     const durationMinutes = Math.floor(durationMs / (1000 * 60));
 
-    // Initialize billable hours
     let billableHours = 0;
     const isCancellable = durationMinutes <= 5;
 
-    // Add 1 hour if more than 5 minutes have passed
     if (durationMinutes > 5) {
       billableHours = 1;
 
-      // Calculate remaining minutes after first hour
       const remainingMinutes = durationMinutes - 60;
       if (remainingMinutes > 0) {
-        // Calculate additional hours with 15-minute grace period
         const additionalHours = Math.floor(remainingMinutes / 60);
         const extraMinutes = remainingMinutes % 60;
         billableHours +=
@@ -66,14 +72,15 @@ export default function FinalBillPage() {
       }
     }
 
-    // Calculate total amount considering quantity
     const hourlyRate = billData.service.pricePerHour;
     const totalAmount = billableHours * hourlyRate * billData.quantity;
 
-    // Calculate balance amount (amount to return to customer)
-    const balanceAmount = Math.max(0, billData.paidAmount - totalAmount);
+    // Subtract discount from balance amount
+    const balanceAmount = Math.max(
+      0,
+      billData.paidAmount - totalAmount - discountAmount
+    );
 
-    // Format duration string
     const hours = Math.floor(durationMinutes / 60);
     const minutes = durationMinutes % 60;
     const usageDuration = `${hours}h ${minutes}m`;
@@ -85,7 +92,7 @@ export default function FinalBillPage() {
       billableHours,
       isCancellable,
     };
-  }, [time, billData]);
+  }, [time, billData, discountAmount]);
 
   const fetchBillDetails = useCallback(async () => {
     if (system.status !== "loaded" || !orderNo) return;
@@ -133,9 +140,27 @@ export default function FinalBillPage() {
       billedHours: billCalculation.billableHours,
       orderNo: billData.orderNo,
       endTime: time,
+      discountAmount: discountAmount, // Add discount amount to the complete bill payload
     });
     await fetchBillDetails();
-  }, [time, billCalculation, billData, system, completeBill, fetchBillDetails]);
+  }, [
+    time,
+    billCalculation,
+    billData,
+    system,
+    completeBill,
+    fetchBillDetails,
+    discountAmount,
+  ]);
+
+  const handleDiscountSave = () => {
+    setShowDiscountInput(false);
+  };
+
+  const handleDiscountCancel = () => {
+    setDiscountAmount(0);
+    setShowDiscountInput(false);
+  };
 
   const handleCancelBill = useCallback(async () => {
     if (!billData) return;
@@ -269,11 +294,17 @@ export default function FinalBillPage() {
           <span>Advance Paid</span>
           <span>{formatAmount(billData.paidAmount)}</span>
         </div>
+        {discountAmount > 0 && (
+          <div className="flex justify-between items-center text-green-600">
+            <span>Discount Applied</span>
+            <span>- {formatAmount(discountAmount)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
           {billData.status === "completed" ? (
             <>
               <span>Returned Amount</span>
-              <span className="text-green-600">
+              <span className="text-red-600">
                 {formatAmount(billData.final?.balanceAmount || 0)}
               </span>
             </>
@@ -373,14 +404,52 @@ export default function FinalBillPage() {
           </div>
         </CardContent>
         {billData.status === "pending" && (
-          <CardFooter className="flex justify-end">
-            {billCalculation.isCancellable ? (
-              <Button variant="destructive" onClick={handleCancelBill}>
-                Cancel Bill
-              </Button>
-            ) : (
-              <Button onClick={handleCompleteBill}>Complete Bill</Button>
-            )}
+          <CardFooter className="flex justify-between">
+            <div className="flex items-center gap-4">
+              {showDiscountInput ? (
+                <div className="flex items-center space-x-2">
+                  <Input
+                    type="number"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(Number(e.target.value))}
+                    placeholder="Enter discount amount"
+                    className="w-40"
+                  />
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleDiscountSave}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleDiscountCancel}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDiscountInput(true)}
+                >
+                  <Gift className="h-4 w-4 mr-2" />
+                  Add Discount
+                </Button>
+              )}
+            </div>
+            <div>
+              {billCalculation.isCancellable ? (
+                <Button variant="destructive" onClick={handleCancelBill}>
+                  Cancel Bill
+                </Button>
+              ) : (
+                <Button onClick={handleCompleteBill}>Complete Bill</Button>
+              )}
+            </div>
           </CardFooter>
         )}
       </Card>

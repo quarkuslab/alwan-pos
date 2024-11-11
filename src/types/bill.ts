@@ -52,6 +52,7 @@ export interface CompleteBillRequest {
   endTime: Date;
   billedHours: number;
   balanceAmount: number;
+  discountAmount: number | null;
 }
 
 export interface SearchBillsRequest {
