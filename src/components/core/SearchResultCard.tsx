@@ -4,6 +4,7 @@ import { Card, CardContent } from "../ui/card";
 import HighlightText from "../ui/highlight";
 import { Button } from "../ui/button";
 import { SearchResultBill } from "@/types/bill";
+import { useSystemState } from "@/hooks/useSystem";
 
 interface Props {
   searchQuery: string;
@@ -16,6 +17,8 @@ export default function SearchResultCard({
   searchQuery,
   onCancel,
 }: Props) {
+  const system = useSystemState();
+
   return (
     <Card className="w-full">
       <CardContent className="p-4">
@@ -55,15 +58,22 @@ export default function SearchResultCard({
                 AED {(bill.paidAmount ?? 0).toFixed(2)}
               </span>
             </div>
-            <div className="mt-3">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onCancel && onCancel(bill)}
-              >
-                Cancel Bill
-              </Button>
-            </div>
+            {system.status == "loaded"
+              ? system.counter.id + "|" + bill.counterId
+              : null}
+            {system.status == "loaded" ? (
+              system.counter.id == bill.counterId ? (
+                <div className="mt-3">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onCancel && onCancel(bill)}
+                  >
+                    Cancel Bill
+                  </Button>
+                </div>
+              ) : null
+            ) : null}
           </div>
         </div>
       </CardContent>

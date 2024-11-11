@@ -47,11 +47,24 @@ export default function FinalBillPage() {
     const durationMs = time.getTime() - startTime.getTime();
     const durationMinutes = Math.floor(durationMs / (1000 * 60));
 
-    // Calculate billable hours with corrected 15-minute rule
-    // When minutes > 15, round up to next hour
-    const hours = Math.floor(durationMinutes / 60);
-    const extraMinutes = durationMinutes % 60;
-    const billableHours = extraMinutes <= 15 ? hours : hours + 1;
+    // Initialize billable hours
+    let billableHours = 0;
+    const isCancellable = durationMinutes <= 5;
+
+    // Add 1 hour if more than 5 minutes have passed
+    if (durationMinutes > 5) {
+      billableHours = 1;
+
+      // Calculate remaining minutes after first hour
+      const remainingMinutes = durationMinutes - 60;
+      if (remainingMinutes > 0) {
+        // Calculate additional hours with 15-minute grace period
+        const additionalHours = Math.floor(remainingMinutes / 60);
+        const extraMinutes = remainingMinutes % 60;
+        billableHours +=
+          extraMinutes <= 15 ? additionalHours : additionalHours + 1;
+      }
+    }
 
     // Calculate total amount considering quantity
     const hourlyRate = billData.service.pricePerHour;
@@ -61,13 +74,16 @@ export default function FinalBillPage() {
     const balanceAmount = Math.max(0, billData.paidAmount - totalAmount);
 
     // Format duration string
-    const usageDuration = `${hours}h ${extraMinutes}m`;
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    const usageDuration = `${hours}h ${minutes}m`;
 
     return {
       usageDuration,
       totalAmount,
       balanceAmount,
       billableHours,
+      isCancellable,
     };
   }, [time, billData]);
 
@@ -219,6 +235,61 @@ export default function FinalBillPage() {
     return null;
   }
 
+  const renderPaymentDetails = () => {
+    if (billData.status === "cancelled") {
+      return (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
+            <span>Amount Paid</span>
+            <span>{formatAmount(billData.paidAmount)}</span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <span>Unit Price (per hour)</span>
+          <span>{formatAmount(billData.service.pricePerHour)}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span>Quantity</span>
+          <span>x {billData.quantity}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span>Hours</span>
+          <span>x {billCalculation.billableHours}</span>
+        </div>
+        <div className="flex justify-between items-center pt-2 border-t">
+          <span>Total Usage Amount</span>
+          <span>{formatAmount(billCalculation.totalAmount)}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span>Advance Paid</span>
+          <span>{formatAmount(billData.paidAmount)}</span>
+        </div>
+        <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
+          {billData.status === "completed" ? (
+            <>
+              <span>Returned Amount</span>
+              <span className="text-green-600">
+                {formatAmount(billData.final?.balanceAmount || 0)}
+              </span>
+            </>
+          ) : (
+            <>
+              <span>Balance to Return</span>
+              <span className="text-green-600">
+                {formatAmount(billCalculation.balanceAmount)}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card>
@@ -251,7 +322,7 @@ export default function FinalBillPage() {
             </div>
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500">Counter</h3>
-              <p className="mt-1">{system.counter.name}</p>
+              <p className="mt-1">{billData.customerName}</p>
             </div>
             <div className="mb-4 pr-4">
               <h3 className="text-sm font-medium text-gray-500">Quantity</h3>
@@ -298,47 +369,20 @@ export default function FinalBillPage() {
               <h3 className="text-lg font-medium">Payment Details</h3>
               <Badge variant="outline">{billData.paymentMethod}</Badge>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>Unit Price (per hour)</span>
-                <span>{formatAmount(billData.service.pricePerHour)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Quantity</span>
-                <span>x {billData.quantity}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Hours</span>
-                <span>x {billCalculation.billableHours}</span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t">
-                <span>Total Usage Amount</span>
-                <span>{formatAmount(billCalculation.totalAmount)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Advance Paid</span>
-                <span>{formatAmount(billData.paidAmount)}</span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
-                <span>Balance to Return</span>
-                <span className="text-green-600">
-                  {formatAmount(billCalculation.balanceAmount)}
-                </span>
-              </div>
-            </div>
+            {renderPaymentDetails()}
           </div>
         </CardContent>
-        {billData.status == "pending" ? (
+        {billData.status === "pending" && (
           <CardFooter className="flex justify-end">
-            {billCalculation.billableHours > 0 ? (
-              <Button onClick={handleCompleteBill}>Complete Bill</Button>
-            ) : (
+            {billCalculation.isCancellable ? (
               <Button variant="destructive" onClick={handleCancelBill}>
                 Cancel Bill
               </Button>
+            ) : (
+              <Button onClick={handleCompleteBill}>Complete Bill</Button>
             )}
           </CardFooter>
-        ) : null}
+        )}
       </Card>
     </div>
   );
