@@ -22,6 +22,7 @@ const PrinterService = {
     paidAmount: number;
     paymentMethod: string;
     remarks: string | null;
+    isFullday: boolean;
   }) {
     if (window.PrinterBridge) {
       await window.PrinterBridge.printLogo();
@@ -83,6 +84,13 @@ const PrinterService = {
       await window.PrinterBridge.setFontSize(24);
       await window.PrinterBridge.printText(
         createJustifiedLine("Service", data.serviceName)
+      );
+
+      // Fullday
+      await window.PrinterBridge.setAlignment(0);
+      await window.PrinterBridge.setFontSize(24);
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Fullday", data.isFullday ? "Yes" : "No")
       );
 
       // Quantity

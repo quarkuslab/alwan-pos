@@ -22,6 +22,7 @@ export async function createInitialBillFlow(
     paymentMethod: bill.paymentMethod.toUpperCase(),
     remarks: bill.remarks ?? null,
     paidAmount: bill.paidAmount,
+    isFullday: bill.isFullday,
   });
 }
 
