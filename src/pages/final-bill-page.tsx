@@ -78,7 +78,7 @@ export default function FinalBillPage() {
     // Subtract discount from balance amount
     const balanceAmount = Math.max(
       0,
-      billData.paidAmount - totalAmount - discountAmount
+      billData.paidAmount - totalAmount + discountAmount
     );
 
     const hours = Math.floor(durationMinutes / 60);
@@ -301,16 +301,16 @@ export default function FinalBillPage() {
           <span>{formatAmount(billData.paidAmount)}</span>
         </div>
         {discountAmount > 0 && (
-          <div className="flex justify-between items-center text-green-600">
+          <div className="flex justify-between items-center text-red-600">
             <span>Discount Applied</span>
-            <span>- {formatAmount(discountAmount)}</span>
+            <span>+ {formatAmount(discountAmount)}</span>
           </div>
         )}
         <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
           {billData.status === "completed" ? (
             <>
               <span>Returned Amount</span>
-              <span className="text-red-600">
+              <span className="text-green-600">
                 {formatAmount(billData.final?.balanceAmount || 0)}
               </span>
             </>
