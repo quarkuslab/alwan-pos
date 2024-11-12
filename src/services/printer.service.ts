@@ -1,6 +1,4 @@
-import { CompleteBill } from "@/types/bill";
 import { formatAmount } from "@/utils/amount";
-import { generateCompleteBill } from "@/utils/generate-complete-bill";
 import { createJustifiedLine, createSeperator } from "@/utils/printer-utils";
 
 const PrinterService = {
@@ -9,14 +7,6 @@ const PrinterService = {
       return Boolean(await window.PrinterBridge.getPrinterStatus());
     }
     return false;
-  },
-
-  async printCompleteBill(bill: CompleteBill) {
-    if (window.PrinterBridge) {
-      const data = generateCompleteBill(bill);
-      await window.PrinterBridge.printText(data);
-      await window.PrinterBridge.cutPaper();
-    }
   },
 
   async printInitialBill(data: {
@@ -188,6 +178,113 @@ const PrinterService = {
       await window.PrinterBridge.lineWrap(3);
 
       // Cut Paper
+      await window.PrinterBridge.cutPaper();
+    }
+  },
+
+  async printCompleteBill(data: {
+    counterName: string;
+    contactInfo: string;
+    orderNo: string;
+    customerName: string;
+    customerPhone: string | null;
+    serviceName: string;
+    quantity: number;
+    startTime: Date;
+    endTime: Date;
+    duration: number;
+    rate: number;
+    paidAmount: number;
+    discountAmount: number | null;
+    balanceAmount: number;
+  }) {
+    if (window.PrinterBridge) {
+      // Company
+      await window.PrinterBridge.setAlignment(1);
+      await window.PrinterBridge.setFontSize(36);
+      await window.PrinterBridge.printText(
+        "Alwan Alqarya Exhibition\nOrganizing L.L.C\n"
+      );
+
+      // Counter Details
+      await window.PrinterBridge.setAlignment(1);
+      await window.PrinterBridge.setFontSize(24);
+      await window.PrinterBridge.printText(data.counterName + "\n");
+      await window.PrinterBridge.printText(data.contactInfo + "\n");
+
+      // Seperator
+      await window.PrinterBridge.setAlignment(0);
+      await window.PrinterBridge.printText(createSeperator());
+
+      await window.PrinterBridge.setAlignment(0);
+      await window.PrinterBridge.setFontSize(24);
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Order No:", data.orderNo)
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Date:", new Date().toLocaleString())
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Customer Name:", data.customerName)
+      );
+      if (data.customerPhone) {
+        await window.PrinterBridge.printText(
+          createJustifiedLine("Customer Phone:", data.customerPhone)
+        );
+      }
+
+      // Billing Details Seperator
+      await window.PrinterBridge.setAlignment(0);
+      await window.PrinterBridge.printText(createSeperator());
+      await window.PrinterBridge.setAlignment(1);
+      await window.PrinterBridge.printText("BILLING DETAILS\n");
+      await window.PrinterBridge.printText(createSeperator());
+
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Service:", data.serviceName)
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Quantity:", data.quantity.toString())
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Start Time:", data.startTime.toLocaleTimeString())
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("End Time:", data.endTime.toLocaleTimeString())
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Duration:", data.duration.toFixed(1) + " Hours")
+      );
+      await window.PrinterBridge.printText(
+        createJustifiedLine("Paid Amount:", formatAmount(data.paidAmount))
+      );
+      if (data.discountAmount) {
+        await window.PrinterBridge.printText(
+          createJustifiedLine(
+            "Discount Amount:",
+            formatAmount(data.discountAmount)
+          )
+        );
+      }
+
+      // Balance Amount
+      await window.PrinterBridge.setAlignment(0);
+      await window.PrinterBridge.printText(createSeperator());
+      await window.PrinterBridge.setFontSize(36);
+      await window.PrinterBridge.printText(
+        createJustifiedLine(
+          "Balance Amount:",
+          formatAmount(data.balanceAmount),
+          36
+        )
+      );
+      await window.PrinterBridge.setFontSize(24);
+      await window.PrinterBridge.printText(createSeperator());
+
+      await window.PrinterBridge.setAlignment(1);
+      await window.PrinterBridge.printText("Thank you for your business!");
+
+      await window.PrinterBridge.lineWrap(2);
       await window.PrinterBridge.cutPaper();
     }
   },

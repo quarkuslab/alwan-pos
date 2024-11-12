@@ -30,6 +30,7 @@ export interface FinalBill {
   endTime: Date;
   billedHours: number;
   balanceAmount: number;
+  discountAmount: number | null;
 }
 
 export interface CompleteBill
