@@ -222,13 +222,44 @@ class MainActivity : ComponentActivity() {
         }
 
         @JavascriptInterface
+        fun setFontSize(fontSize: Float) {
+            try {
+                printerService?.apply {
+                    setFontSize(fontSize, null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun setAlignment(alignment: Int) {
+            try {
+                printerService?.apply {
+                    setAlignment(alignment, null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun lineWrap(lines: Int) {
+            try {
+                printerService?.apply {
+                    lineWrap(lines, null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+
+        @JavascriptInterface
         fun printText(text: String) {
             try {
                 printerService?.apply {
-                    // Left Align text
-                    setAlignment(0, null)
                     printText(text, null)
-                    lineWrap(1, null)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -248,9 +279,7 @@ class MainActivity : ComponentActivity() {
                         2,              // width
                         0,              // no text
                         null            // callback
-                    )
-
-                    lineWrap(1, null)     // Cut paper after barcode
+                    ) // Cut paper after barcode
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -261,7 +290,6 @@ class MainActivity : ComponentActivity() {
         fun cutPaper() {
             try {
                 printerService?.apply {
-                    lineWrap(3, null)
                     cutPaper(null)
                 }
             } catch (e: Exception) {

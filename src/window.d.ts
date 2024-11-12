@@ -1,6 +1,9 @@
 declare global {
   interface Window {
     PrinterBridge?: {
+      lineWrap: (lines: number) => Promise<void>;
+      setFontSize: (fontSize: number) => Promise<void>;
+      setAlignment: (alignmentValue: number) => Promise<void>;
       printLogo: () => Promise<void>;
       printText: (text: string) => Promise<void>;
       printBarcode: (data: string) => Promise<void>;

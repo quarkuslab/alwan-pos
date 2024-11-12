@@ -9,7 +9,20 @@ export async function createInitialBillFlow(
   const canPrint = await PrinterService.canPrint();
   if (!canPrint) throw new Error("Unable to print");
   const bill = await BillService.createInitialBill(token, data);
-  await PrinterService.printInitialBill(bill);
+  await PrinterService.printInitialBill({
+    counterName: bill.counter.name,
+    contactInfo: bill.counter.contactInfo,
+    orderNo: bill.orderNo,
+    orderDate: bill.startTime,
+    customerName: bill.customerName,
+    customerPhone: bill.customerPhone ?? null,
+    serviceName: bill.service.title,
+    quantity: bill.quantity,
+    rate: bill.service.pricePerHour,
+    paymentMethod: bill.paymentMethod.toUpperCase(),
+    remarks: bill.remarks ?? null,
+    paidAmount: bill.paidAmount,
+  });
 }
 
 export async function createCompleteBillFlow(
