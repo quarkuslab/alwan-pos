@@ -82,6 +82,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            resValue("string", "app_name", "Alwan POS Debug")
         }
         release {
             signingConfig = signingConfigs.getByName("release")
