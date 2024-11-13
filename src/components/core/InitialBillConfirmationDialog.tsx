@@ -66,10 +66,6 @@ const BillingConfirmationDialog = ({
     }).format(new Date(date));
   };
 
-  const calculateTotal = (data: CreateInitialBillRequest) => {
-    return service.advanceAmount * data.quantity;
-  };
-
   if (!data) return null;
 
   return (
@@ -201,7 +197,7 @@ const BillingConfirmationDialog = ({
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total Amount</span>
                     <span className="font-semibold text-lg">
-                      {displayAmount(calculateTotal(data))}
+                      {displayAmount(data.paidAmount)}
                     </span>
                   </div>
                 </div>
