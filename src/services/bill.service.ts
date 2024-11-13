@@ -4,8 +4,8 @@ import {
   CompleteBillRequest,
   CreateInitialBillRequest,
   CreateInitialBillResponse,
+  FinalPageResult,
   PaginatedSearchResponse,
-  SearchResultBill,
 } from "@/types/bill";
 
 export const BillService = {
@@ -82,9 +82,9 @@ export const BillService = {
     }
   },
 
-  async getBillData(token: string, orderNo: string): Promise<SearchResultBill> {
+  async getBillData(token: string, orderNo: string): Promise<FinalPageResult> {
     try {
-      const response = await client.get<{ bill: SearchResultBill }>(
+      const response = await client.get<{ bill: FinalPageResult }>(
         `/counter/bill-data/${orderNo}`,
         {
           headers: { "X-Counter-Token": token },

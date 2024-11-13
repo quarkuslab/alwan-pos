@@ -31,7 +31,7 @@ import {
   useCompleteBillOperation,
 } from "@/hooks/useOperations";
 import useTime from "@/hooks/useTime";
-import { InitialBill, SearchResultBill } from "@/types/bill";
+import { FinalPageResult, InitialBill } from "@/types/bill";
 
 interface PageError {
   type: "not_found" | "error";
@@ -45,7 +45,7 @@ export default function FinalBillPage() {
   const completeBill = useCompleteBillOperation();
   const [orderNo, setOrderNo] = useQueryState("orderNo", { defaultValue: "" });
   const [manualOrderNo, setManualOrderNo] = useState("");
-  const [billData, setBillData] = useState<SearchResultBill | null>(null);
+  const [billData, setBillData] = useState<FinalPageResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<PageError | null>(null);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -364,7 +364,7 @@ export default function FinalBillPage() {
             </div>
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500">Counter</h3>
-              <p className="mt-1">{billData.customerName}</p>
+              <p className="mt-1">{billData.counter.name}</p>
             </div>
             <div className="mb-4 pr-4">
               <h3 className="text-sm font-medium text-gray-500">Quantity</h3>

@@ -73,6 +73,19 @@ export interface SearchResultBill extends InitialBill {
   };
 }
 
+export interface FinalPageResult extends InitialBill {
+  service: Service;
+  counter: SystemCounter;
+  final?: {
+    id: number;
+    orderNo: string;
+    endTime: Date;
+    balanceAmount: number;
+    discountAmount: number | null;
+    billedHours: number;
+  };
+}
+
 export interface PaginatedSearchResponse {
   bills: SearchResultBill[];
   pagination: {
