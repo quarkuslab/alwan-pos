@@ -266,6 +266,12 @@ const PrinterService = {
       await window.PrinterBridge.printText(
         createJustifiedLine("Paid Amount:", formatAmount(data.paidAmount))
       );
+      await window.PrinterBridge.printText(
+        createJustifiedLine(
+          "Bill Amount:",
+          formatAmount(data.paidAmount - data.balanceAmount)
+        )
+      );
       if (data.discountAmount) {
         await window.PrinterBridge.printText(
           createJustifiedLine(

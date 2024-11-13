@@ -53,8 +53,12 @@ export default function FinalBillPage() {
 
   const billCalculation = useMemo(() => {
     if (!billData) return null;
+    let now = time;
+    if (billData.status == "completed" && billData.final) {
+      now = billData.final.endTime;
+    }
     const startTime = billData.startTime;
-    const durationMs = time.getTime() - startTime.getTime();
+    const durationMs = now.getTime() - startTime.getTime();
     const durationMinutes = Math.floor(durationMs / (1000 * 60));
 
     let billableHours = 0;
