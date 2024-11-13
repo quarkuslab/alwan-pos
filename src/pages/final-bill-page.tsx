@@ -78,6 +78,8 @@ export default function FinalBillPage() {
 
     const hourlyRate = billData.service.pricePerHour;
     const totalAmount = billableHours * hourlyRate * billData.quantity;
+    const maximumCuttoff =
+      billData.service.fulldayAdvanceAmount * billData.quantity;
 
     // Subtract discount from balance amount
     let balanceAmount = Math.max(
@@ -89,9 +91,8 @@ export default function FinalBillPage() {
     const minutes = durationMinutes % 60;
     const usageDuration = `${hours}h ${minutes}m`;
 
-    if (totalAmount > billData.service.fulldayAdvanceAmount) {
-      balanceAmount =
-        billData.paidAmount - billData.service.fulldayAdvanceAmount;
+    if (totalAmount > maximumCuttoff) {
+      balanceAmount = billData.paidAmount - maximumCuttoff;
     }
 
     return {
