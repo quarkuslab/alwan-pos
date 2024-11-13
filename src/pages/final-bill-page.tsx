@@ -126,9 +126,10 @@ export default function FinalBillPage() {
     fetchBillDetails();
   }, [orderNo, system, fetchBillDetails]);
 
-  // useEffect(() => {
-  //   setDiscountAmount()
-  // })
+  useEffect(() => {
+    setDiscountAmount(0);
+    setShowDiscountInput(false);
+  }, [billData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
