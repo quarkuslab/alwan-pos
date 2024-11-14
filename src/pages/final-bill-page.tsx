@@ -293,6 +293,62 @@ export default function FinalBillPage() {
       );
     }
 
+    if (billData.status == "completed") {
+      return (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span>Unit Price (per hour)</span>
+            <span>{formatAmount(billData.service.pricePerHour)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Quantity</span>
+            <span>x {billData.quantity}</span>
+          </div>
+          {billData.final ? (
+            <div className="flex justify-between items-center">
+              <span>Billed Hours</span>
+              <span>x {billData.final.billedHours}</span>
+            </div>
+          ) : null}
+          <div className="flex justify-between items-center pt-2 border-t">
+            <span>Advance Paid</span>
+            <span>{formatAmount(billData.paidAmount)}</span>
+          </div>
+          {billData.final ? (
+            <div className="flex justify-between items-center">
+              <span>Total Usage Amount</span>
+              <span>
+                {formatAmount(
+                  billData.service.pricePerHour *
+                    billData.quantity *
+                    billData.final.billedHours
+                )}
+              </span>
+            </div>
+          ) : null}
+          {billData.final?.discountAmount ? (
+            <div className="flex justify-between items-center">
+              <span>Discount Applied</span>
+              <span className="text-red-500">
+                {formatAmount(billData.final.discountAmount)}
+              </span>
+            </div>
+          ) : null}
+          {billData.final ? (
+            <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
+              <span>Returned Amount</span>
+              <span>{formatAmount(billData.final.balanceAmount)}</span>
+            </div>
+          ) : (
+            <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
+              <span>Fullday</span>
+              <span>Yes</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-2">
         <div className="flex justify-between items-center">
@@ -322,21 +378,10 @@ export default function FinalBillPage() {
           </div>
         )}
         <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
-          {billData.status === "completed" ? (
-            <>
-              <span>Returned Amount</span>
-              <span className="text-green-600">
-                {formatAmount(billData.final?.balanceAmount || 0)}
-              </span>
-            </>
-          ) : (
-            <>
-              <span>Balance to Return</span>
-              <span className="text-green-600">
-                {formatAmount(billCalculation.balanceAmount)}
-              </span>
-            </>
-          )}
+          <span>Balance to Return</span>
+          <span className="text-green-600">
+            {formatAmount(billCalculation.balanceAmount)}
+          </span>
         </div>
       </div>
     );
