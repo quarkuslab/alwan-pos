@@ -311,7 +311,7 @@ export default function FinalBillPage() {
             </div>
           ) : null}
           <div className="flex justify-between items-center pt-2 border-t">
-            <span>Advance Paid</span>
+            <span>{billData.isFullday ? "Paid Amount" : "Advance Paid"}</span>
             <span>{formatAmount(billData.paidAmount)}</span>
           </div>
           {billData.final ? (
