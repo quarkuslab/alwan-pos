@@ -63,6 +63,7 @@ export interface SearchBillsRequest {
 }
 
 export interface SearchResultBill extends InitialBill {
+  counterName: string;
   service: Service;
   final?: {
     id: number;
