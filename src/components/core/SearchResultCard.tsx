@@ -1,4 +1,4 @@
-import { User, Phone, CreditCard, Clock, Copy } from "lucide-react";
+import { User, Phone, CreditCard, Clock, Copy, MonitorCog } from "lucide-react";
 import { displayTime } from "@/utils/time";
 import { Card, CardContent } from "../ui/card";
 import HighlightText from "../ui/highlight";
@@ -112,6 +112,10 @@ export default function SearchResultCard({
             <div className="flex items-center space-x-2">
               <CreditCard className="w-4 h-4 text-muted-foreground" />
               <span className="uppercase">{bill.paymentMethod}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <MonitorCog className="w-4 h-4 text-muted-foreground" />
+              <span className="uppercase">{bill.customerName}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-2xl font-bold">
