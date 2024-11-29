@@ -183,7 +183,7 @@ const InitialBillForm = forwardRef<Methods, Props>((props, ref) => {
                 <FormItem>
                   <FormLabel>Customer Phone</FormLabel>
                   <FormControl>
-                    <FormInput {...field} />
+                    <FormInput {...field} type="tel" />
                   </FormControl>
                 </FormItem>
               )}
