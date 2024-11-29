@@ -115,7 +115,7 @@ export default function SearchResultCard({
             </div>
             <div className="flex items-center space-x-2">
               <MonitorCog className="w-4 h-4 text-muted-foreground" />
-              <span className="uppercase">{bill.customerName}</span>
+              <span className="uppercase">{bill.counterName}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-2xl font-bold">
